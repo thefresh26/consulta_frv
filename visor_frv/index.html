@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consulta de Bienes · Fondo para la Reparación a las Víctimas</title>
+<style>
+  :root{
+    --ink:#1a1d1f;
+    --ink-soft:#52585c;
+    --paper:#fafaf8;
+    --paper-2:#ffffff;
+    --line:#dcdcd6;
+    --gold:#caa419;
+    --gold-deep:#8a6f0e;
+    --gold-pale:#f7eed0;
+    --ok:#2f7d4f;
+    --ok-bg:#e4f4ea;
+    --no:#b14a3b;
+    --no-bg:#fbe9e6;
+    --mono: 'IBM Plex Mono', 'Courier New', monospace;
+    --serif: 'Source Serif 4', Georgia, serif;
+    --sans: 'IBM Plex Sans', Arial, sans-serif;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:14px;
+    line-height:1.5;
+  }
+
+  /* ── HEADER ─────────────────────────────────────────────── */
+  header{
+    background:var(--ink);
+    color:#fff;
+    padding:0;
+    border-bottom:4px solid var(--gold);
+  }
+  .header-inner{
+    max-width:1400px;
+    margin:0 auto;
+    padding:22px 28px 18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:16px;
+  }
+  .brand-eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:6px;
+  }
+  .brand-title{
+    font-family:var(--serif);
+    font-size:30px;
+    font-weight:600;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .brand-sub{
+    font-size:13px;
+    color:#c7c9cb;
+    margin-top:4px;
+  }
+  .header-stats{
+    display:flex;
+    gap:28px;
+    font-family:var(--mono);
+  }
+  .hstat{
+    text-align:right;
+  }
+  .hstat .n{
+    font-size:22px;
+    font-weight:600;
+    color:#fff;
+    display:block;
+    line-height:1;
+  }
+  .hstat .l{
+    font-size:10px;
+    color:#9a9d9f;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+  }
+
+  /* ── TOOLBAR ────────────────────────────────────────────── */
+  .toolbar{
+    background:var(--paper-2);
+    border-bottom:1px solid var(--line);
+    position:sticky;
+    top:0;
+    z-index:50;
+  }
+  .toolbar-inner{
+    max-width:1400px;
+    margin:0 auto;
+    padding:16px 28px;
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .search-box{
+    position:relative;
+    flex:1 1 320px;
+    min-width:240px;
+  }
+  .search-box input{
+    width:100%;
+    padding:11px 14px 11px 38px;
+    border:1.5px solid var(--line);
+    border-radius:3px;
+    font-family:var(--sans);
+    font-size:14px;
+    background:var(--paper-2);
+    color:var(--ink);
+    transition:border-color .15s;
+  }
+  .search-box input:focus{
+    outline:none;
+    border-color:var(--gold-deep);
+  }
+  .search-box svg{
+    position:absolute;
+    left:12px;
+    top:50%;
+    transform:translateY(-50%);
+    width:16px;
+    height:16px;
+    stroke:var(--ink-soft);
+  }
+  select, .filter-pill{
+    padding:10px 12px;
+    border:1.5px solid var(--line);
+    border-radius:3px;
+    font-family:var(--sans);
+    font-size:13px;
+    background:var(--paper-2);
+    color:var(--ink);
+    cursor:pointer;
+  }
+  select:focus{outline:none; border-color:var(--gold-deep);}
+
+  .toggle-group{
+    display:flex;
+    gap:6px;
+  }
+  .toggle-btn{
+    padding:9px 14px;
+    border:1.5px solid var(--line);
+    border-radius:3px;
+    background:var(--paper-2);
+    font-family:var(--sans);
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:.12s;
+    white-space:nowrap;
+  }
+  .toggle-btn:hover{border-color:var(--gold);}
+  .toggle-btn.active{
+    background:var(--ink);
+    border-color:var(--ink);
+    color:#fff;
+  }
+  .toggle-btn.active.foto{background:var(--ok); border-color:var(--ok);}
+  .toggle-btn.active.aval{background:var(--gold-deep); border-color:var(--gold-deep);}
+
+  .clear-btn{
+    padding:10px 14px;
+    border:1.5px solid transparent;
+    background:none;
+    font-family:var(--sans);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    text-decoration:underline;
+    cursor:pointer;
+  }
+  .clear-btn:hover{color:var(--no);}
+
+  /* ── BODY LAYOUT ────────────────────────────────────────── */
+  .layout{
+    max-width:1400px;
+    margin:0 auto;
+    padding:22px 28px 60px;
+  }
+
+  .results-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .results-bar b{color:var(--ink); font-weight:600;}
+
+  /* ── TABLE ──────────────────────────────────────────────── */
+  .table-wrap{
+    border:1px solid var(--line);
+    border-radius:4px;
+    overflow:hidden;
+    background:var(--paper-2);
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+  }
+  thead th{
+    background:#f1efe8;
+    border-bottom:2px solid var(--ink);
+    padding:11px 12px;
+    text-align:left;
+    font-family:var(--mono);
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--ink-soft);
+    white-space:nowrap;
+    cursor:pointer;
+    user-select:none;
+  }
+  thead th:hover{color:var(--ink);}
+  thead th .arrow{opacity:0.35; margin-left:3px; font-size:9px;}
+  thead th.sorted .arrow{opacity:1; color:var(--gold-deep);}
+
+  tbody tr{
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+    transition:background .1s;
+  }
+  tbody tr:hover{background:var(--gold-pale);}
+  tbody tr:nth-child(even){background:#fbfaf7;}
+  tbody tr:nth-child(even):hover{background:var(--gold-pale);}
+
+  td{
+    padding:10px 12px;
+    vertical-align:middle;
+  }
+  .td-codigo{font-family:var(--mono); font-size:12px; color:var(--ink-soft);}
+  .td-nombre{font-weight:600; max-width:220px;}
+  .td-nombre .sub{
+    font-weight:400;
+    font-size:11px;
+    color:var(--ink-soft);
+    display:block;
+    margin-top:1px;
+  }
+  .td-fmi{font-family:var(--mono); font-size:12px;}
+
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    padding:3px 9px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:600;
+    font-family:var(--mono);
+  }
+  .badge.si{background:var(--ok-bg); color:var(--ok);}
+  .badge.no{background:var(--no-bg); color:var(--no);}
+  .badge .dot{width:6px; height:6px; border-radius:50%; background:currentColor;}
+
+  .etapa-pill{
+    font-size:10.5px;
+    font-family:var(--mono);
+    text-transform:uppercase;
+    padding:3px 8px;
+    border-radius:3px;
+    letter-spacing:.03em;
+    white-space:nowrap;
+  }
+  .etapa-RECEPCION{background:#eef2f6; color:#3c5a73;}
+  .etapa-PREALISTAMIENTO{background:#fdf3e3; color:#8a6010;}
+  .etapa-ALISTAMIENTO{background:#fdf3e3; color:#8a6010;}
+  .etapa-MONETIZADO{background:var(--ok-bg); color:var(--ok);}
+  .etapa-RESTITUIDO{background:#e9e6f5; color:#5d4b9c;}
+  .etapa-DADO_DE_BAJA_POR_MEDIDA_CAUTELAR{background:var(--no-bg); color:var(--no);}
+
+  .val-monto{font-family:var(--mono); font-size:12px; text-align:right; display:block;}
+
+  /* ── PAGINATION ─────────────────────────────────────────── */
+  .pagination{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:6px;
+    padding:18px 0 4px;
+    font-family:var(--mono);
+  }
+  .page-btn{
+    padding:7px 13px;
+    border:1.5px solid var(--line);
+    background:var(--paper-2);
+    border-radius:3px;
+    cursor:pointer;
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+  .page-btn:hover:not(:disabled){border-color:var(--gold-deep); color:var(--ink);}
+  .page-btn:disabled{opacity:.35; cursor:default;}
+  .page-btn.current{background:var(--ink); color:#fff; border-color:var(--ink);}
+
+  /* ── EMPTY STATE ────────────────────────────────────────── */
+  .empty-state{
+    text-align:center;
+    padding:70px 20px;
+    color:var(--ink-soft);
+  }
+  .empty-state svg{width:42px; height:42px; stroke:var(--line); margin-bottom:14px;}
+  .empty-state h3{font-family:var(--serif); font-size:18px; color:var(--ink); margin:0 0 6px;}
+
+  /* ── MODAL ──────────────────────────────────────────────── */
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(20,18,12,.55);
+    display:none;
+    align-items:flex-start;
+    justify-content:center;
+    z-index:200;
+    padding:40px 20px;
+    overflow-y:auto;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:var(--paper-2);
+    max-width:680px;
+    width:100%;
+    border-radius:6px;
+    box-shadow:0 24px 60px rgba(0,0,0,.3);
+    overflow:hidden;
+  }
+  .modal-head{
+    background:var(--ink);
+    color:#fff;
+    padding:22px 26px;
+    position:relative;
+    border-bottom:4px solid var(--gold);
+  }
+  .modal-head .eyebrow{
+    font-family:var(--mono);
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--gold);
+    margin-bottom:6px;
+  }
+  .modal-head h2{
+    font-family:var(--serif);
+    font-size:22px;
+    margin:0;
+    font-weight:600;
+    padding-right:30px;
+  }
+  .modal-close{
+    position:absolute; top:18px; right:18px;
+    background:none; border:none;
+    color:#c7c9cb; cursor:pointer;
+    width:30px; height:30px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%;
+    transition:.12s;
+  }
+  .modal-close:hover{background:rgba(255,255,255,.12); color:#fff;}
+
+  .modal-body{padding:24px 26px 28px;}
+
+  .mgrid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px 22px;
+    margin-bottom:22px;
+  }
+  .mfield{}
+  .mfield .lab{
+    font-family:var(--mono);
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.07em;
+    color:var(--ink-soft);
+    margin-bottom:3px;
+  }
+  .mfield .val{
+    font-size:14px;
+    color:var(--ink);
+  }
+  .mfield.full{grid-column:1/-1;}
+
+  .mstatus-row{
+    display:flex;
+    gap:10px;
+    margin-bottom:22px;
+  }
+  .mstatus-card{
+    flex:1;
+    border:1.5px solid var(--line);
+    border-radius:5px;
+    padding:14px;
+  }
+  .mstatus-card.ok{border-color:var(--ok); background:var(--ok-bg);}
+  .mstatus-card.no{border-color:#e0ddd2; background:#f7f6f1;}
+  .mstatus-card .lab{
+    font-family:var(--mono); font-size:10px; text-transform:uppercase;
+    letter-spacing:.06em; color:var(--ink-soft); margin-bottom:4px;
+  }
+  .mstatus-card .big{font-family:var(--serif); font-size:17px; font-weight:600;}
+  .mstatus-card.ok .big{color:var(--ok);}
+  .mstatus-card .detail{font-size:11.5px; color:var(--ink-soft); margin-top:4px;}
+
+  .modal-actions{
+    display:flex; gap:10px;
+    border-top:1px solid var(--line);
+    padding-top:18px;
+  }
+  .btn-primary{
+    flex:1;
+    padding:12px;
+    background:var(--ink);
+    color:#fff;
+    text-align:center;
+    text-decoration:none;
+    border-radius:4px;
+    font-size:13px;
+    font-weight:600;
+    border:none;
+    cursor:pointer;
+  }
+  .btn-primary:hover{background:var(--gold-deep);}
+
+  /* ── FOOTER ─────────────────────────────────────────────── */
+  footer{
+    border-top:1px solid var(--line);
+    padding:22px 28px;
+    text-align:center;
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+
+  @media (max-width: 760px){
+    .header-stats{display:none;}
+    .mgrid{grid-template-columns:1fr;}
+    table{font-size:12px;}
+    .td-nombre{max-width:140px;}
+  }
+
+  ::-webkit-scrollbar{width:10px; height:10px;}
+  ::-webkit-scrollbar-track{background:var(--paper);}
+  ::-webkit-scrollbar-thumb{background:var(--line); border-radius:5px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <div class="brand-eyebrow">Fondo para la Reparación a las Víctimas</div>
+      <h1 class="brand-title">Consulta de Bienes FRV</h1>
+      <div class="brand-sub">Registro de inventario · fotografías · avalúos</div>
+    </div>
+    <div class="header-stats">
+      <div class="hstat"><span class="n" id="stat-total">—</span><span class="l">Predios</span></div>
+      <div class="hstat"><span class="n" id="stat-foto">—</span><span class="l">Con foto</span></div>
+      <div class="hstat"><span class="n" id="stat-aval">—</span><span class="l">Con avalúo</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="searchInput" type="text" placeholder="Buscar por FMI, código FRV, nombre o postulado…">
+    </div>
+    <select id="filterDepto"><option value="">Departamento (todos)</option></select>
+    <select id="filterEtapa"><option value="">Etapa (todas)</option></select>
+    <div class="toggle-group">
+      <button class="toggle-btn foto" data-filter="foto" data-val="">Foto: todos</button>
+    </div>
+    <div class="toggle-group">
+      <button class="toggle-btn aval" data-filter="aval" data-val="">Avalúo: todos</button>
+    </div>
+    <button class="clear-btn" id="clearBtn">Limpiar filtros</button>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="results-bar">
+    <span id="resultsCount"></span>
+    <span id="lastUpdate"></span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th data-sort="codigo_frv">Código <span class="arrow">▾</span></th>
+          <th data-sort="nombre_bien">Bien <span class="arrow">▾</span></th>
+          <th data-sort="fmi">FMI <span class="arrow">▾</span></th>
+          <th data-sort="departamento">Ubicación <span class="arrow">▾</span></th>
+          <th data-sort="etapa">Etapa <span class="arrow">▾</span></th>
+          <th data-sort="foto">Foto <span class="arrow">▾</span></th>
+          <th data-sort="avaluo">Avalúo <span class="arrow">▾</span></th>
+          <th data-sort="valor">Valor avalúo <span class="arrow">▾</span></th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <div id="emptyState" class="empty-state" style="display:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <h3>Sin resultados</h3>
+    <div>Ajusta la búsqueda o los filtros para encontrar predios.</div>
+  </div>
+
+  <div class="pagination" id="pagination"></div>
+</div>
+
+<footer>
+  Datos extraídos del portal FRV · Unidad para las Víctimas — solo lectura, sin almacenamiento externo
+</footer>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div class="eyebrow" id="modalCodigo">—</div>
+      <h2 id="modalNombre">—</h2>
+    </div>
+    <div class="modal-body">
+      <div class="mstatus-row">
+        <div class="mstatus-card" id="cardFoto">
+          <div class="lab">Registro fotográfico</div>
+          <div class="big" id="mFotoEstado">—</div>
+          <div class="detail" id="mFotoDetalle"></div>
+        </div>
+        <div class="mstatus-card" id="cardAval">
+          <div class="lab">Avalúo</div>
+          <div class="big" id="mAvalEstado">—</div>
+          <div class="detail" id="mAvalDetalle"></div>
+        </div>
+      </div>
+
+      <div class="mgrid">
+        <div class="mfield"><div class="lab">FMI</div><div class="val" id="mFmi">—</div></div>
+        <div class="mfield"><div class="lab">Tipo de bien</div><div class="val" id="mTipo">—</div></div>
+        <div class="mfield"><div class="lab">Departamento</div><div class="val" id="mDepto">—</div></div>
+        <div class="mfield"><div class="lab">Municipio</div><div class="val" id="mMuni">—</div></div>
+        <div class="mfield"><div class="lab">Etapa de gestión</div><div class="val" id="mEtapa">—</div></div>
+        <div class="mfield"><div class="lab">Sistema administración</div><div class="val" id="mSistema">—</div></div>
+        <div class="mfield"><div class="lab">Extinción de dominio</div><div class="val" id="mExtincion">—</div></div>
+        <div class="mfield"><div class="lab">Valor contable</div><div class="val" id="mValorContable">—</div></div>
+        <div class="mfield full"><div class="lab">Postulado</div><div class="val" id="mPostulado">—</div></div>
+        <div class="mfield full"><div class="lab">Bloque</div><div class="val" id="mBloque">—</div></div>
+        <div class="mfield full"><div class="lab">Álbumes registrados</div><div class="val" id="mAlbumes">—</div></div>
+      </div>
+
+      <div class="modal-actions">
+        <a class="btn-primary" id="mLinkFRV" href="#" target="_blank" rel="noopener">Abrir en el portal FRV ↗</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let DATA = [];
+let filtered = [];
+let currentPage = 1;
+const PAGE_SIZE = 50;
+let sortKey = null;
+let sortDir = 1;
+
+const state = { search:'', depto:'', etapa:'', foto:'', aval:'' };
+
+async function loadData(){
+  try{
+    const res = await fetch('data.json');
+    DATA = await res.json();
+  }catch(e){
+    document.getElementById('resultsCount').textContent = 'No se pudo cargar data.json — colócalo junto a este HTML.';
+    return;
+  }
+  populateFilters();
+  computeStats();
+  applyFilters();
+}
+
+function populateFilters(){
+  const deptos = [...new Set(DATA.map(d=>d['DEPARTAMENTO']).filter(Boolean))].sort();
+  const etapas = [...new Set(DATA.map(d=>d['ETAPA GESTIÓN']).filter(Boolean))].sort();
+
+  const selD = document.getElementById('filterDepto');
+  deptos.forEach(d=>{
+    const o = document.createElement('option');
+    o.value = d; o.textContent = d;
+    selD.appendChild(o);
+  });
+
+  const selE = document.getElementById('filterEtapa');
+  etapas.forEach(e=>{
+    const o = document.createElement('option');
+    o.value = e; o.textContent = e.charAt(0)+e.slice(1).toLowerCase();
+    selE.appendChild(o);
+  });
+}
+
+function computeStats(){
+  document.getElementById('stat-total').textContent = DATA.length.toLocaleString('es-CO');
+  const foto = DATA.filter(d => (d['TIENE FOTO']||'').toUpperCase().startsWith('S')).length;
+  const aval = DATA.filter(d => (d['TIENE AVALÚO']||'').toUpperCase().startsWith('S')).length;
+  document.getElementById('stat-foto').textContent = foto.toLocaleString('es-CO');
+  document.getElementById('stat-aval').textContent = aval.toLocaleString('es-CO');
+}
+
+function isYes(v){ return (v||'').toString().trim().toUpperCase().startsWith('S'); }
+
+function applyFilters(){
+  const q = state.search.trim().toLowerCase();
+  filtered = DATA.filter(d=>{
+    if(q){
+      const hay = (d['FMI']+' '+d['CÓDIGO FRV']+' '+d['NOMBRE BIEN']+' '+d['POSTULADO']).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    if(state.depto && d['DEPARTAMENTO'] !== state.depto) return false;
+    if(state.etapa && d['ETAPA GESTIÓN'] !== state.etapa) return false;
+    if(state.foto === 'si' && !isYes(d['TIENE FOTO'])) return false;
+    if(state.foto === 'no' && isYes(d['TIENE FOTO'])) return false;
+    if(state.aval === 'si' && !isYes(d['TIENE AVALÚO'])) return false;
+    if(state.aval === 'no' && isYes(d['TIENE AVALÚO'])) return false;
+    return true;
+  });
+
+  if(sortKey) sortData();
+  currentPage = 1;
+  render();
+}
+
+function sortData(){
+  const map = {
+    codigo_frv:'CÓDIGO FRV', nombre_bien:'NOMBRE BIEN', fmi:'FMI',
+    departamento:'DEPARTAMENTO', etapa:'ETAPA GESTIÓN',
+    foto:'TIENE FOTO', avaluo:'TIENE AVALÚO'
+  };
+  filtered.sort((a,b)=>{
+    let va, vb;
+    if(sortKey === 'valor'){
+      va = parseFloat((a['VALOR AVALÚO']||'0').replace(/[^\d,]/g,'').replace(',','.')) || 0;
+      vb = parseFloat((b['VALOR AVALÚO']||'0').replace(/[^\d,]/g,'').replace(',','.')) || 0;
+    } else {
+      va = (a[map[sortKey]]||'').toString().toLowerCase();
+      vb = (b[map[sortKey]]||'').toString().toLowerCase();
+    }
+    if(va < vb) return -1*sortDir;
+    if(va > vb) return 1*sortDir;
+    return 0;
+  });
+}
+
+function etapaClass(etapa){
+  return 'etapa-' + (etapa||'').replace(/\s+/g,'_');
+}
+
+function fmtMoney(v){
+  if(!v) return '—';
+  const s = v.toString().replace('$','').trim();
+  return s ? '$ '+s : '—';
+}
+
+function render(){
+  const tbody = document.getElementById('tableBody');
+  const empty = document.getElementById('emptyState');
+  const total = filtered.length;
+  const start = (currentPage-1)*PAGE_SIZE;
+  const pageItems = filtered.slice(start, start+PAGE_SIZE);
+
+  document.getElementById('resultsCount').innerHTML =
+    `<b>${total.toLocaleString('es-CO')}</b> predios encontrados`;
+
+  if(total === 0){
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = pageItems.map((d, i)=>{
+    const idx = DATA.indexOf(d);
+    const foto = isYes(d['TIENE FOTO']);
+    const aval = isYes(d['TIENE AVALÚO']);
+    return `
+    <tr onclick="openModal(${idx})">
+      <td class="td-codigo">${d['CÓDIGO FRV']||'—'}</td>
+      <td class="td-nombre">${d['NOMBRE BIEN']||'Sin nombre'}<span class="sub">${(d['TIPO BIEN']||'').split(' - ').slice(1).join(' · ')}</span></td>
+      <td class="td-fmi">${d['FMI']||'—'}</td>
+      <td>${d['MUNICIPIO']||'—'}<span class="sub" style="display:block;font-size:10.5px;color:var(--ink-soft)">${d['DEPARTAMENTO']||''}</span></td>
+      <td><span class="etapa-pill ${etapaClass(d['ETAPA GESTIÓN'])}">${d['ETAPA GESTIÓN']||'—'}</span></td>
+      <td>${foto ? `<span class="badge si"><span class="dot"></span>Sí · ${d['CANT. FOTOS']||0}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>
+      <td>${aval ? `<span class="badge si"><span class="dot"></span>${d['AÑO AVALÚO']||'Sí'}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>
+      <td><span class="val-monto">${fmtMoney(d['VALOR AVALÚO'])}</span></td>
+    </tr>`;
+  }).join('');
+
+  renderPagination(total);
+}
+
+function renderPagination(total){
+  const pages = Math.ceil(total/PAGE_SIZE);
+  const pag = document.getElementById('pagination');
+  if(pages <= 1){ pag.innerHTML=''; return; }
+
+  let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹ Anterior</button>`;
+
+  let pagesToShow = [];
+  for(let p=1; p<=pages; p++){
+    if(p===1 || p===pages || Math.abs(p-currentPage)<=2) pagesToShow.push(p);
+  }
+  let prev = 0;
+  pagesToShow.forEach(p=>{
+    if(prev && p - prev > 1) html += `<span style="padding:0 4px;color:var(--ink-soft)">…</span>`;
+    html += `<button class="page-btn ${p===currentPage?'current':''}" onclick="goPage(${p})">${p}</button>`;
+    prev = p;
+  });
+
+  html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===pages?'disabled':''}>Siguiente ›</button>`;
+  pag.innerHTML = html;
+}
+
+function goPage(p){
+  currentPage = p;
+  render();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function openModal(idx){
+  const d = DATA[idx];
+  document.getElementById('modalCodigo').textContent = d['CÓDIGO FRV'] || ('Código '+d['CÓDIGO']);
+  document.getElementById('modalNombre').textContent = d['NOMBRE BIEN'] || 'Sin nombre registrado';
+
+  const foto = isYes(d['TIENE FOTO']);
+  const aval = isYes(d['TIENE AVALÚO']);
+
+  const cardFoto = document.getElementById('cardFoto');
+  cardFoto.className = 'mstatus-card ' + (foto ? 'ok':'no');
+  document.getElementById('mFotoEstado').textContent = foto ? 'Disponible' : 'No registrado';
+  document.getElementById('mFotoDetalle').textContent = foto
+    ? `${d['CANT. ÁLBUMES']||0} álbum(es) · ${d['CANT. FOTOS']||0} fotos`
+    : 'Sin álbum fotográfico cargado';
+
+  const cardAval = document.getElementById('cardAval');
+  cardAval.className = 'mstatus-card ' + (aval ? 'ok':'no');
+  document.getElementById('mAvalEstado').textContent = aval ? fmtMoney(d['VALOR AVALÚO']) : 'No registrado';
+  document.getElementById('mAvalDetalle').textContent = aval
+    ? `${d['TIPO AVALÚO']||''} · vigencia ${d['AÑO AVALÚO']||'—'} · ${d['FECHA AVALÚO']||''}`
+    : 'Sin avalúo registrado en el sistema';
+
+  document.getElementById('mFmi').textContent = d['FMI'] || 'No aplica';
+  document.getElementById('mTipo').textContent = d['TIPO BIEN'] || '—';
+  document.getElementById('mDepto').textContent = d['DEPARTAMENTO'] || '—';
+  document.getElementById('mMuni').textContent = d['MUNICIPIO'] || '—';
+  document.getElementById('mEtapa').textContent = d['ETAPA GESTIÓN'] || '—';
+  document.getElementById('mSistema').textContent = d['SISTEMA ADMON'] || 'No definido';
+  document.getElementById('mExtincion').textContent = (d['EXTINCIÓN DOMINIO']||'').toUpperCase()==='SI' ? 'Sí' : 'No';
+  document.getElementById('mValorContable').textContent = d['VALOR CONTABLE'] ? '$ '+d['VALOR CONTABLE'] : '—';
+  document.getElementById('mPostulado').textContent = d['POSTULADO'] || 'No registrado';
+  document.getElementById('mBloque').textContent = d['BLOQUE'] || 'No registrado';
+  document.getElementById('mAlbumes').textContent = d['ÁLBUMES'] || 'Sin álbumes';
+
+  const link = document.getElementById('mLinkFRV');
+  if(d['URL DETALLE']){ link.href = d['URL DETALLE']; link.style.display='block'; }
+  else { link.style.display='none'; }
+
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+document.getElementById('modalClose').onclick = ()=> document.getElementById('modalOverlay').classList.remove('open');
+document.getElementById('modalOverlay').onclick = (e)=>{ if(e.target.id==='modalOverlay') e.currentTarget.classList.remove('open'); };
+
+// Eventos
+document.getElementById('searchInput').addEventListener('input', e=>{
+  state.search = e.target.value;
+  applyFilters();
+});
+document.getElementById('filterDepto').addEventListener('change', e=>{
+  state.depto = e.target.value;
+  applyFilters();
+});
+document.getElementById('filterEtapa').addEventListener('change', e=>{
+  state.etapa = e.target.value;
+  applyFilters();
+});
+
+document.querySelectorAll('.toggle-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const filter = btn.dataset.filter;
+    const group = document.querySelectorAll(`.toggle-btn.${filter}`);
+    // cycle: '' -> 'si' -> 'no' -> ''
+    const cur = state[filter];
+    const next = cur === '' ? 'si' : cur === 'si' ? 'no' : '';
+    state[filter] = next;
+    btn.classList.toggle('active', next !== '');
+    btn.textContent = filter === 'foto'
+      ? (next==='' ? 'Foto: todos' : next==='si' ? 'Foto: sí ✓' : 'Foto: no ✕')
+      : (next==='' ? 'Avalúo: todos' : next==='si' ? 'Avalúo: sí ✓' : 'Avalúo: no ✕');
+    applyFilters();
+  });
+});
+
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  state.search=''; state.depto=''; state.etapa=''; state.foto=''; state.aval='';
+  document.getElementById('searchInput').value='';
+  document.getElementById('filterDepto').value='';
+  document.getElementById('filterEtapa').value='';
+  document.querySelectorAll('.toggle-btn').forEach(b=>{
+    b.classList.remove('active');
+    b.textContent = b.classList.contains('foto') ? 'Foto: todos' : 'Avalúo: todos';
+  });
+  applyFilters();
+});
+
+document.querySelectorAll('th[data-sort]').forEach(th=>{
+  th.addEventListener('click', ()=>{
+    const key = th.dataset.sort;
+    if(sortKey === key){ sortDir *= -1; } else { sortKey = key; sortDir = 1; }
+    document.querySelectorAll('th[data-sort]').forEach(t=>t.classList.remove('sorted'));
+    th.classList.add('sorted');
+    th.querySelector('.arrow').textContent = sortDir===1 ? '▾' : '▴';
+    applyFilters();
+  });
+});
+
+document.getElementById('lastUpdate').textContent = 'Actualizado: ' + new Date().toLocaleDateString('es-CO', {day:'2-digit',month:'long',year:'numeric'});
+
+loadData();
+</script>
+</body>
+</html>

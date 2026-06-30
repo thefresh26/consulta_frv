@@ -1,0 +1,21 @@
+# Datos sensibles y logs — NUNCA subir al repo
+scraper_datos.log
+estado_datos.json
+FRV_DATOS_COMPLETO.xlsx
+/data.json
+
+# Scripts de scraping y conversión (solo el visor va al repo)
+scraper_datos.py
+excel_a_json.py
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+venv/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
