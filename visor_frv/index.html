@@ -632,8 +632,6 @@
         <div class="mfield"><div class="lab">Sistema administración</div><div class="val" id="mSistema">—</div></div>
         <div class="mfield"><div class="lab">Extinción de dominio</div><div class="val" id="mExtincion">—</div></div>
         <div class="mfield"><div class="lab">Valor contable</div><div class="val" id="mValorContable">—</div></div>
-        <div class="mfield full"><div class="lab">Postulado</div><div class="val" id="mPostulado">—</div></div>
-        <div class="mfield full"><div class="lab">Bloque</div><div class="val" id="mBloque">—</div></div>
         <div class="mfield full"><div class="lab">Álbumes registrados</div><div class="val" id="mAlbumes">—</div></div>
       </div>
 
@@ -890,8 +888,6 @@ function openModal(idx){
   document.getElementById('mSistema').textContent = d['SISTEMA ADMON'] || 'No definido';
   document.getElementById('mExtincion').textContent = (d['EXTINCIÓN DOMINIO']||'').toUpperCase()==='SI' ? 'Sí' : 'No';
   document.getElementById('mValorContable').textContent = d['VALOR CONTABLE'] ? '$ '+d['VALOR CONTABLE'] : '—';
-  document.getElementById('mPostulado').textContent = d['POSTULADO'] || 'No registrado';
-  document.getElementById('mBloque').textContent = d['BLOQUE'] || 'No registrado';
   document.getElementById('mAlbumes').textContent = d['ÁLBUMES'] || 'Sin álbumes';
 
   const link = document.getElementById('mLinkFRV');
