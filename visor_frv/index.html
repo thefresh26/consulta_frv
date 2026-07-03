@@ -399,6 +399,17 @@
   }
   .mfield.full{grid-column:1/-1;}
 
+  .msection-title{
+    font-family:var(--mono);
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--ink-soft);
+    border-top:1px solid var(--line);
+    padding-top:16px;
+    margin-bottom:14px;
+  }
+
   .mstatus-row{
     display:flex;
     gap:10px;
@@ -633,6 +644,23 @@
         <div class="mfield"><div class="lab">Extinción de dominio</div><div class="val" id="mExtincion">—</div></div>
         <div class="mfield"><div class="lab">Valor contable</div><div class="val" id="mValorContable">—</div></div>
         <div class="mfield full"><div class="lab">Álbumes registrados</div><div class="val" id="mAlbumes">—</div></div>
+      </div>
+
+      <div class="msection-title">Áreas Técnicas</div>
+      <div class="mgrid">
+        <div class="mfield"><div class="lab">Área Ha Catastro</div><div class="val" id="mAreaHaCatastro">—</div></div>
+        <div class="mfield"><div class="lab">Área Ha Escritura</div><div class="val" id="mAreaHaEscritura">—</div></div>
+        <div class="mfield"><div class="lab">Área Ha Matrícula</div><div class="val" id="mAreaHaMatricula">—</div></div>
+        <div class="mfield"><div class="lab">Área M2 Catastro</div><div class="val" id="mAreaM2Catastro">—</div></div>
+        <div class="mfield"><div class="lab">Área M2 Escritura</div><div class="val" id="mAreaM2Escritura">—</div></div>
+        <div class="mfield"><div class="lab">Área M2 Matrícula</div><div class="val" id="mAreaM2Matricula">—</div></div>
+        <div class="mfield"><div class="lab">Área construida</div><div class="val" id="mAreaConstruida">—</div></div>
+        <div class="mfield"><div class="lab">Estado folio</div><div class="val" id="mEstadoFolio">—</div></div>
+        <div class="mfield"><div class="lab">Estado actual bien</div><div class="val" id="mEstadoActualBien">—</div></div>
+        <div class="mfield"><div class="lab">Con avalúo comercial</div><div class="val" id="mConAvaluoComerc">—</div></div>
+        <div class="mfield"><div class="lab">Fecha apertura</div><div class="val" id="mFechaApertura">—</div></div>
+        <div class="mfield"><div class="lab">Fecha inspección</div><div class="val" id="mFechaInspecc">—</div></div>
+        <div class="mfield"><div class="lab">N° catastral</div><div class="val" id="mNCatastral">—</div></div>
       </div>
 
       <div class="modal-actions">
@@ -889,6 +917,20 @@ function openModal(idx){
   document.getElementById('mExtincion').textContent = (d['EXTINCIÓN DOMINIO']||'').toUpperCase()==='SI' ? 'Sí' : 'No';
   document.getElementById('mValorContable').textContent = d['VALOR CONTABLE'] ? '$ '+d['VALOR CONTABLE'] : '—';
   document.getElementById('mAlbumes').textContent = d['ÁLBUMES'] || 'Sin álbumes';
+
+  document.getElementById('mAreaHaCatastro').textContent = d['ÁREA HA CATASTRO'] || '—';
+  document.getElementById('mAreaHaEscritura').textContent = d['ÁREA HA ESCRITURA'] || '—';
+  document.getElementById('mAreaHaMatricula').textContent = d['ÁREA HA MATRÍCULA'] || '—';
+  document.getElementById('mAreaM2Catastro').textContent = d['ÁREA M2 CATASTRO'] || '—';
+  document.getElementById('mAreaM2Escritura').textContent = d['ÁREA M2 ESCRITURA'] || '—';
+  document.getElementById('mAreaM2Matricula').textContent = d['ÁREA M2 MATRÍCULA'] || '—';
+  document.getElementById('mAreaConstruida').textContent = d['ÁREA CONSTRUIDA'] || '—';
+  document.getElementById('mEstadoFolio').textContent = d['ESTADO FOLIO'] || '—';
+  document.getElementById('mEstadoActualBien').textContent = d['ESTADO ACTUAL BIEN'] || '—';
+  document.getElementById('mConAvaluoComerc').textContent = d['CON AVALÚO COMERC.'] || '—';
+  document.getElementById('mFechaApertura').textContent = d['FECHA APERTURA'] || '—';
+  document.getElementById('mFechaInspecc').textContent = d['FECHA INSPECC.'] || '—';
+  document.getElementById('mNCatastral').textContent = d['N° CATASTRAL'] || '—';
 
   const link = document.getElementById('mLinkFRV');
   if(d['URL DETALLE']){ link.href = d['URL DETALLE']; link.style.display='block'; }
