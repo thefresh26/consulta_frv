@@ -150,6 +150,24 @@
   }
   select:focus{outline:none; border-color:var(--gold-deep);}
 
+  .area-filter{
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .area-filter input{
+    width:120px;
+    padding:10px 12px;
+    border:1.5px solid var(--line);
+    border-radius:3px;
+    font-family:var(--sans);
+    font-size:13px;
+    background:var(--paper-2);
+    color:var(--ink);
+  }
+  .area-filter input:focus{outline:none; border-color:var(--gold-deep);}
+  .area-sep{color:var(--ink-soft); font-size:13px;}
+
   .toggle-group{
     display:flex;
     gap:6px;
@@ -501,6 +519,8 @@
     .search-box{flex:none; width:100%; min-width:0;}
     .search-box input{min-height:44px; font-size:15px;}
     select{width:100%; min-height:44px; font-size:15px;}
+    .area-filter{width:100%;}
+    .area-filter input{flex:1; min-width:0; min-height:44px; font-size:15px;}
     .toggle-group{width:100%;}
     .toggle-btn{flex:1; min-height:44px; font-size:13px;}
     .clear-btn{
@@ -564,6 +584,11 @@
     </div>
     <select id="filterDepto"><option value="">Departamento (todos)</option></select>
     <select id="filterEtapa"><option value="">Etapa (todas)</option></select>
+    <div class="area-filter">
+      <input id="filterAreaMin" type="number" step="any" min="0" placeholder="Área mínima HA">
+      <span class="area-sep">–</span>
+      <input id="filterAreaMax" type="number" step="any" min="0" placeholder="Área máxima HA">
+    </div>
     <div class="toggle-group">
       <button class="toggle-btn foto" data-filter="foto" data-val="">Foto: todos</button>
     </div>
@@ -670,7 +695,7 @@ const PAGE_SIZE = 50;
 let sortKey = null;
 let sortDir = 1;
 
-const state = { search:'', depto:'', etapa:'', foto:'', aval:'' };
+const state = { search:'', depto:'', etapa:'', foto:'', aval:'', areaMin:'', areaMax:'' };
 
 async function loadData(){
   try{
@@ -714,8 +739,17 @@ function computeStats(){
 
 function isYes(v){ return (v||'').toString().trim().toUpperCase().startsWith('S'); }
 
+function parseHa(v){
+  const s = (v||'').toString().trim();
+  if(s === '' || s === '—') return null;
+  const n = parseFloat(s.replace(',', '.'));
+  return isNaN(n) ? null : n;
+}
+
 function applyFilters(){
   const q = state.search.trim().toLowerCase();
+  const areaMin = state.areaMin !== '' ? parseFloat(state.areaMin) : null;
+  const areaMax = state.areaMax !== '' ? parseFloat(state.areaMax) : null;
   filtered = DATA.filter(d=>{
     if(q){
       const hay = (d['FMI']+' '+d['CÓDIGO FRV']+' '+d['NOMBRE BIEN']+' '+d['POSTULADO']).toLowerCase();
@@ -727,6 +761,13 @@ function applyFilters(){
     if(state.foto === 'no' && isYes(d['TIENE FOTO'])) return false;
     if(state.aval === 'si' && !isYes(d['TIENE AVALÚO'])) return false;
     if(state.aval === 'no' && isYes(d['TIENE AVALÚO'])) return false;
+    if(areaMin !== null || areaMax !== null){
+      const area = parseHa(d['ÁREA HA CATASTRO']);
+      if(area !== null){
+        if(areaMin !== null && area < areaMin) return false;
+        if(areaMax !== null && area > areaMax) return false;
+      }
+    }
     return true;
   });
 
@@ -936,6 +977,14 @@ document.getElementById('filterEtapa').addEventListener('change', e=>{
   state.etapa = e.target.value;
   applyFilters();
 });
+document.getElementById('filterAreaMin').addEventListener('input', e=>{
+  state.areaMin = e.target.value;
+  applyFilters();
+});
+document.getElementById('filterAreaMax').addEventListener('input', e=>{
+  state.areaMax = e.target.value;
+  applyFilters();
+});
 
 document.querySelectorAll('.toggle-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
@@ -954,10 +1003,12 @@ document.querySelectorAll('.toggle-btn').forEach(btn=>{
 });
 
 document.getElementById('clearBtn').addEventListener('click', ()=>{
-  state.search=''; state.depto=''; state.etapa=''; state.foto=''; state.aval='';
+  state.search=''; state.depto=''; state.etapa=''; state.foto=''; state.aval=''; state.areaMin=''; state.areaMax='';
   document.getElementById('searchInput').value='';
   document.getElementById('filterDepto').value='';
   document.getElementById('filterEtapa').value='';
+  document.getElementById('filterAreaMin').value='';
+  document.getElementById('filterAreaMax').value='';
   document.querySelectorAll('.toggle-btn').forEach(b=>{
     b.classList.remove('active');
     b.textContent = b.classList.contains('foto') ? 'Foto: todos' : 'Avalúo: todos';
