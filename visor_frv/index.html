@@ -591,7 +591,6 @@
           <th data-sort="etapa">Etapa <span class="arrow">▾</span></th>
           <th data-sort="foto">Foto <span class="arrow">▾</span></th>
           <th data-sort="avaluo">Avalúo <span class="arrow">▾</span></th>
-          <th data-sort="valor">Valor avalúo <span class="arrow">▾</span></th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -627,22 +626,15 @@
           <div class="big" id="mFotoEstado">—</div>
           <div class="detail" id="mFotoDetalle"></div>
         </div>
-        <div class="mstatus-card" id="cardAval">
-          <div class="lab">Avalúo</div>
-          <div class="big" id="mAvalEstado">—</div>
-          <div class="detail" id="mAvalDetalle"></div>
-        </div>
       </div>
 
       <div class="mgrid">
         <div class="mfield"><div class="lab">FMI</div><div class="val" id="mFmi">—</div></div>
-        <div class="mfield"><div class="lab">Tipo de bien</div><div class="val" id="mTipo">—</div></div>
         <div class="mfield"><div class="lab">Departamento</div><div class="val" id="mDepto">—</div></div>
         <div class="mfield"><div class="lab">Municipio</div><div class="val" id="mMuni">—</div></div>
         <div class="mfield"><div class="lab">Etapa de gestión</div><div class="val" id="mEtapa">—</div></div>
         <div class="mfield"><div class="lab">Sistema administración</div><div class="val" id="mSistema">—</div></div>
         <div class="mfield"><div class="lab">Extinción de dominio</div><div class="val" id="mExtincion">—</div></div>
-        <div class="mfield"><div class="lab">Valor contable</div><div class="val" id="mValorContable">—</div></div>
         <div class="mfield full"><div class="lab">Álbumes registrados</div><div class="val" id="mAlbumes">—</div></div>
       </div>
 
@@ -850,7 +842,6 @@ function render(){
         <td><span class="etapa-pill ${etapaClass(d['ETAPA GESTIÓN'])}">${d['ETAPA GESTIÓN']||'—'}</span></td>
         <td>${foto ? `<span class="badge si"><span class="dot"></span>Sí · ${d['CANT. FOTOS']||0}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>
         <td>${aval ? `<span class="badge si"><span class="dot"></span>${d['AÑO AVALÚO']||'Sí'}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>
-        <td><span class="val-monto">${fmtMoney(d['VALOR AVALÚO'])}</span></td>
       </tr>`;
     }).join('');
   }
@@ -892,7 +883,6 @@ function openModal(idx){
   document.getElementById('modalNombre').textContent = d['NOMBRE BIEN'] || 'Sin nombre registrado';
 
   const foto = isYes(d['TIENE FOTO']);
-  const aval = isYes(d['TIENE AVALÚO']);
 
   const cardFoto = document.getElementById('cardFoto');
   cardFoto.className = 'mstatus-card ' + (foto ? 'ok':'no');
@@ -901,21 +891,12 @@ function openModal(idx){
     ? `${d['CANT. ÁLBUMES']||0} álbum(es) · ${d['CANT. FOTOS']||0} fotos`
     : 'Sin álbum fotográfico cargado';
 
-  const cardAval = document.getElementById('cardAval');
-  cardAval.className = 'mstatus-card ' + (aval ? 'ok':'no');
-  document.getElementById('mAvalEstado').textContent = aval ? fmtMoney(d['VALOR AVALÚO']) : 'No registrado';
-  document.getElementById('mAvalDetalle').textContent = aval
-    ? `${d['TIPO AVALÚO']||''} · vigencia ${d['AÑO AVALÚO']||'—'} · ${d['FECHA AVALÚO']||''}`
-    : 'Sin avalúo registrado en el sistema';
-
   document.getElementById('mFmi').textContent = d['FMI'] || 'No aplica';
-  document.getElementById('mTipo').textContent = d['TIPO BIEN'] || '—';
   document.getElementById('mDepto').textContent = d['DEPARTAMENTO'] || '—';
   document.getElementById('mMuni').textContent = d['MUNICIPIO'] || '—';
   document.getElementById('mEtapa').textContent = d['ETAPA GESTIÓN'] || '—';
   document.getElementById('mSistema').textContent = d['SISTEMA ADMON'] || 'No definido';
   document.getElementById('mExtincion').textContent = (d['EXTINCIÓN DOMINIO']||'').toUpperCase()==='SI' ? 'Sí' : 'No';
-  document.getElementById('mValorContable').textContent = d['VALOR CONTABLE'] ? '$ '+d['VALOR CONTABLE'] : '—';
   document.getElementById('mAlbumes').textContent = d['ÁLBUMES'] || 'Sin álbumes';
 
   document.getElementById('mAreaHaCatastro').textContent = d['ÁREA HA CATASTRO'] || '—';
