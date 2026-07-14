@@ -679,10 +679,6 @@
         <div class="mfield"><div class="lab">Fecha inspección</div><div class="val" id="mFechaInspecc">—</div></div>
         <div class="mfield"><div class="lab">N° catastral</div><div class="val" id="mNCatastral">—</div></div>
       </div>
-
-      <div class="modal-actions">
-        <a class="btn-primary" id="mLinkFRV" href="#" target="_blank" rel="noopener">Abrir en el portal FRV ↗</a>
-      </div>
     </div>
   </div>
 </div>
@@ -701,6 +697,7 @@ async function loadData(){
   try{
     const res = await fetch('data.json');
     DATA = await res.json();
+    DATA = DATA.filter(d => (d['TIPO BIEN']||'').toUpperCase().startsWith('BIENES INMUEBLES'));
   }catch(e){
     document.getElementById('resultsCount').textContent = 'No se pudo cargar data.json — colócalo junto a este HTML.';
     return;
@@ -953,10 +950,6 @@ function openModal(idx){
   document.getElementById('mFechaApertura').textContent = d['FECHA APERTURA'] || '—';
   document.getElementById('mFechaInspecc').textContent = d['FECHA INSPECC.'] || '—';
   document.getElementById('mNCatastral').textContent = d['N° CATASTRAL'] || '—';
-
-  const link = document.getElementById('mLinkFRV');
-  if(d['URL DETALLE']){ link.href = d['URL DETALLE']; link.style.display='block'; }
-  else { link.style.display='none'; }
 
   document.getElementById('modalOverlay').classList.add('open');
 }
