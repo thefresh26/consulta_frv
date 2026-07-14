@@ -609,6 +609,7 @@
           <th data-sort="fmi">FMI <span class="arrow">▾</span></th>
           <th data-sort="departamento">Ubicación <span class="arrow">▾</span></th>
           <th data-sort="etapa">Etapa <span class="arrow">▾</span></th>
+          <th data-sort="extinto">Extinto <span class="arrow">▾</span></th>
           <th data-sort="area">Área (ha) <span class="arrow">▾</span></th>
           <th data-sort="foto">Foto <span class="arrow">▾</span></th>
           <th data-sort="avaluo">Avalúo <span class="arrow">▾</span></th>
@@ -732,6 +733,13 @@ function computeStats(){
 
 function isYes(v){ return (v||'').toString().trim().toUpperCase().startsWith('S'); }
 
+function extintoLabel(v){
+  const val = (v||'').toString().trim().toUpperCase();
+  if(val === 'SI') return `<span style="color:var(--ok);font-weight:600">Sí</span>`;
+  if(val === 'NO') return `<span style="color:var(--no);font-weight:600">No</span>`;
+  return '';
+}
+
 function parseHa(v){
   const s = (v||'').toString().trim();
   if(s === '' || s === '—') return null;
@@ -764,6 +772,7 @@ function sortData(){
   const map = {
     codigo_frv:'CÓDIGO FRV', nombre_bien:'NOMBRE BIEN', fmi:'FMI',
     departamento:'DEPARTAMENTO', etapa:'ETAPA GESTIÓN',
+    extinto:'EXTINCIÓN DOMINIO',
     foto:'TIENE FOTO', avaluo:'TIENE AVALÚO'
   };
   filtered.sort((a,b)=>{
@@ -868,6 +877,7 @@ function render(){
         <td class="td-fmi">${d['FMI']||'—'}</td>
         <td>${d['MUNICIPIO']||'—'}<span class="sub" style="display:block;font-size:10.5px;color:var(--ink-soft)">${d['DEPARTAMENTO']||''}</span></td>
         <td><span class="etapa-pill ${etapaClass(d['ETAPA GESTIÓN'])}">${d['ETAPA GESTIÓN']||'—'}</span></td>
+        <td>${extintoLabel(d['EXTINCIÓN DOMINIO'])}</td>
         <td>${d['ÁREA HA CATASTRO']||'—'}</td>
         <td>${foto ? `<span class="badge si"><span class="dot"></span>Sí · ${d['CANT. FOTOS']||0}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>
         <td>${aval ? `<span class="badge si"><span class="dot"></span>${d['AÑO AVALÚO']||'Sí'}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>
