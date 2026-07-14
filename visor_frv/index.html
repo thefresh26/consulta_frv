@@ -614,6 +614,7 @@
           <th data-sort="fmi">FMI <span class="arrow">▾</span></th>
           <th data-sort="departamento">Ubicación <span class="arrow">▾</span></th>
           <th data-sort="etapa">Etapa <span class="arrow">▾</span></th>
+          <th data-sort="area">Área (ha) <span class="arrow">▾</span></th>
           <th data-sort="foto">Foto <span class="arrow">▾</span></th>
           <th data-sort="avaluo">Avalúo <span class="arrow">▾</span></th>
         </tr>
@@ -784,6 +785,9 @@ function sortData(){
     if(sortKey === 'valor'){
       va = parseFloat((a['VALOR AVALÚO']||'0').replace(/[^\d,]/g,'').replace(',','.')) || 0;
       vb = parseFloat((b['VALOR AVALÚO']||'0').replace(/[^\d,]/g,'').replace(',','.')) || 0;
+    } else if(sortKey === 'area'){
+      va = parseHa(a['ÁREA HA CATASTRO']) ?? -1;
+      vb = parseHa(b['ÁREA HA CATASTRO']) ?? -1;
     } else {
       va = (a[map[sortKey]]||'').toString().toLowerCase();
       vb = (b[map[sortKey]]||'').toString().toLowerCase();
@@ -878,6 +882,7 @@ function render(){
         <td class="td-fmi">${d['FMI']||'—'}</td>
         <td>${d['MUNICIPIO']||'—'}<span class="sub" style="display:block;font-size:10.5px;color:var(--ink-soft)">${d['DEPARTAMENTO']||''}</span></td>
         <td><span class="etapa-pill ${etapaClass(d['ETAPA GESTIÓN'])}">${d['ETAPA GESTIÓN']||'—'}</span></td>
+        <td>${d['ÁREA HA CATASTRO']||'—'}</td>
         <td>${foto ? `<span class="badge si"><span class="dot"></span>Sí · ${d['CANT. FOTOS']||0}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>
         <td>${aval ? `<span class="badge si"><span class="dot"></span>${d['AÑO AVALÚO']||'Sí'}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>
       </tr>`;
