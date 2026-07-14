@@ -584,11 +584,6 @@
     </div>
     <select id="filterDepto"><option value="">Departamento (todos)</option></select>
     <select id="filterEtapa"><option value="">Etapa (todas)</option></select>
-    <div class="area-filter">
-      <input id="filterAreaMin" type="number" step="any" min="0" placeholder="Área mínima HA">
-      <span class="area-sep">–</span>
-      <input id="filterAreaMax" type="number" step="any" min="0" placeholder="Área máxima HA">
-    </div>
     <div class="toggle-group">
       <button class="toggle-btn foto" data-filter="foto" data-val="">Foto: todos</button>
     </div>
@@ -692,7 +687,7 @@ const PAGE_SIZE = 50;
 let sortKey = null;
 let sortDir = 1;
 
-const state = { search:'', depto:'', etapa:'', foto:'', aval:'', areaMin:'', areaMax:'' };
+const state = { search:'', depto:'', etapa:'', foto:'', aval:'' };
 
 async function loadData(){
   try{
@@ -746,8 +741,6 @@ function parseHa(v){
 
 function applyFilters(){
   const q = state.search.trim().toLowerCase();
-  const areaMin = state.areaMin !== '' ? parseFloat(state.areaMin) : null;
-  const areaMax = state.areaMax !== '' ? parseFloat(state.areaMax) : null;
   filtered = DATA.filter(d=>{
     if(q){
       const hay = (d['FMI']+' '+d['CÓDIGO FRV']+' '+d['NOMBRE BIEN']+' '+d['POSTULADO']).toLowerCase();
@@ -759,13 +752,6 @@ function applyFilters(){
     if(state.foto === 'no' && isYes(d['TIENE FOTO'])) return false;
     if(state.aval === 'si' && !isYes(d['TIENE AVALÚO'])) return false;
     if(state.aval === 'no' && isYes(d['TIENE AVALÚO'])) return false;
-    if(areaMin !== null || areaMax !== null){
-      const area = parseHa(d['ÁREA HA CATASTRO']);
-      if(area !== null){
-        if(areaMin !== null && area < areaMin) return false;
-        if(areaMax !== null && area > areaMax) return false;
-      }
-    }
     return true;
   });
 
@@ -975,15 +961,6 @@ document.getElementById('filterEtapa').addEventListener('change', e=>{
   state.etapa = e.target.value;
   applyFilters();
 });
-document.getElementById('filterAreaMin').addEventListener('input', e=>{
-  state.areaMin = e.target.value;
-  applyFilters();
-});
-document.getElementById('filterAreaMax').addEventListener('input', e=>{
-  state.areaMax = e.target.value;
-  applyFilters();
-});
-
 document.querySelectorAll('.toggle-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     const filter = btn.dataset.filter;
@@ -1001,12 +978,10 @@ document.querySelectorAll('.toggle-btn').forEach(btn=>{
 });
 
 document.getElementById('clearBtn').addEventListener('click', ()=>{
-  state.search=''; state.depto=''; state.etapa=''; state.foto=''; state.aval=''; state.areaMin=''; state.areaMax='';
+  state.search=''; state.depto=''; state.etapa=''; state.foto=''; state.aval='';
   document.getElementById('searchInput').value='';
   document.getElementById('filterDepto').value='';
   document.getElementById('filterEtapa').value='';
-  document.getElementById('filterAreaMin').value='';
-  document.getElementById('filterAreaMax').value='';
   document.querySelectorAll('.toggle-btn').forEach(b=>{
     b.classList.remove('active');
     b.textContent = b.classList.contains('foto') ? 'Foto: todos' : 'Avalúo: todos';
