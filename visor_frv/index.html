@@ -789,8 +789,9 @@ function applyFilters(){
     }
     if(state.depto && d['DEPARTAMENTO'] !== state.depto) return false;
     if(state.etapa && d['ETAPA GESTIÓN'] !== state.etapa) return false;
-    if(state.foto === 'si' && !isYes(d['TIENE FOTO'])) return false;
-    if(state.foto === 'no' && isYes(d['TIENE FOTO'])) return false;
+    const tieneFotoCloudinary = Array.isArray(d['FOTOS_CLOUDINARY']) && d['FOTOS_CLOUDINARY'].length > 0;
+    if(state.foto === 'si' && !tieneFotoCloudinary) return false;
+    if(state.foto === 'no' && tieneFotoCloudinary) return false;
     if(state.aval === 'si' && !isYes(d['TIENE AVALÚO'])) return false;
     if(state.aval === 'no' && isYes(d['TIENE AVALÚO'])) return false;
     return true;
