@@ -245,12 +245,7 @@
     letter-spacing:.06em;
     color:var(--ink-soft);
     white-space:nowrap;
-    cursor:pointer;
-    user-select:none;
   }
-  thead th:hover{color:var(--ink);}
-  thead th .arrow{opacity:0.35; margin-left:3px; font-size:9px;}
-  thead th.sorted .arrow{opacity:1; color:var(--gold-deep);}
 
   tbody tr{
     border-bottom:1px solid var(--line);
@@ -632,15 +627,15 @@
     <table>
       <thead>
         <tr>
-          <th data-sort="codigo_frv">Código <span class="arrow">▾</span></th>
-          <th data-sort="nombre_bien">Bien <span class="arrow">▾</span></th>
-          <th data-sort="fmi">FMI <span class="arrow">▾</span></th>
-          <th data-sort="departamento">Ubicación <span class="arrow">▾</span></th>
-          <th data-sort="etapa">Etapa <span class="arrow">▾</span></th>
-          <th data-sort="extinto">Extinto <span class="arrow">▾</span></th>
-          <th data-sort="area">Área (ha) <span class="arrow">▾</span></th>
-          <th data-sort="foto">Foto <span class="arrow">▾</span></th>
-          <th data-sort="avaluo">Avalúo <span class="arrow">▾</span></th>
+          <th>Código</th>
+          <th>Bien</th>
+          <th>FMI</th>
+          <th>Ubicación</th>
+          <th>Etapa</th>
+          <th>Extinto</th>
+          <th>Área (ha)</th>
+          <th>Foto</th>
+          <th>Avalúo</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -718,8 +713,6 @@ let DATA = [];
 let filtered = [];
 let currentPage = 1;
 const PAGE_SIZE = 50;
-let sortKey = null;
-let sortDir = 1;
 
 const state = { search:'', depto:'', etapa:'', foto:'', aval:'' };
 
@@ -797,34 +790,8 @@ function applyFilters(){
     return true;
   });
 
-  if(sortKey) sortData();
   currentPage = 1;
   render();
-}
-
-function sortData(){
-  const map = {
-    codigo_frv:'CÓDIGO FRV', nombre_bien:'NOMBRE BIEN', fmi:'FMI',
-    departamento:'DEPARTAMENTO', etapa:'ETAPA GESTIÓN',
-    extinto:'EXTINCIÓN DOMINIO',
-    foto:'TIENE FOTO', avaluo:'TIENE AVALÚO'
-  };
-  filtered.sort((a,b)=>{
-    let va, vb;
-    if(sortKey === 'valor'){
-      va = parseFloat((a['VALOR AVALÚO']||'0').replace(/[^\d,]/g,'').replace(',','.')) || 0;
-      vb = parseFloat((b['VALOR AVALÚO']||'0').replace(/[^\d,]/g,'').replace(',','.')) || 0;
-    } else if(sortKey === 'area'){
-      va = parseHa(a['ÁREA HA CATASTRO']) ?? -1;
-      vb = parseHa(b['ÁREA HA CATASTRO']) ?? -1;
-    } else {
-      va = (a[map[sortKey]]||'').toString().toLowerCase();
-      vb = (b[map[sortKey]]||'').toString().toLowerCase();
-    }
-    if(va < vb) return -1*sortDir;
-    if(va > vb) return 1*sortDir;
-    return 0;
-  });
 }
 
 function etapaClass(etapa){
@@ -1068,17 +1035,6 @@ document.getElementById('clearBtn').addEventListener('click', ()=>{
     b.textContent = b.classList.contains('foto') ? 'Foto: todos' : 'Avalúo: todos';
   });
   applyFilters();
-});
-
-document.querySelectorAll('th[data-sort]').forEach(th=>{
-  th.addEventListener('click', ()=>{
-    const key = th.dataset.sort;
-    if(sortKey === key){ sortDir *= -1; } else { sortKey = key; sortDir = 1; }
-    document.querySelectorAll('th[data-sort]').forEach(t=>t.classList.remove('sorted'));
-    th.classList.add('sorted');
-    th.querySelector('.arrow').textContent = sortDir===1 ? '▾' : '▴';
-    applyFilters();
-  });
 });
 
 document.getElementById('lastUpdate').textContent = 'Actualizado: ' + new Date().toLocaleDateString('es-CO', {day:'2-digit',month:'long',year:'numeric'});
