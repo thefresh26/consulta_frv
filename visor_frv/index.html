@@ -986,12 +986,12 @@ function openModal(idx){
 
   renderGallery(d['FOTOS_CLOUDINARY']);
 
-  const foto = isYes(d['TIENE FOTO']);
+  const cantFotosCloudinary = Array.isArray(d['FOTOS_CLOUDINARY']) ? d['FOTOS_CLOUDINARY'].length : 0;
+  const foto = cantFotosCloudinary > 0;
 
   const cardFoto = document.getElementById('cardFoto');
   cardFoto.className = 'mstatus-card ' + (foto ? 'ok':'no');
   document.getElementById('mFotoEstado').textContent = foto ? 'Disponible' : 'No registrado';
-  const cantFotosCloudinary = Array.isArray(d['FOTOS_CLOUDINARY']) ? d['FOTOS_CLOUDINARY'].length : 0;
   document.getElementById('mFotoDetalle').textContent = foto
     ? `${d['CANT. ÁLBUMES']||0} álbum(es) · ${cantFotosCloudinary} fotos`
     : 'Sin álbum fotográfico cargado';
