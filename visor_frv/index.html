@@ -428,6 +428,36 @@
     margin-bottom:14px;
   }
 
+  .mgallery{margin-bottom:22px;}
+  .mgallery-main{
+    width:100%;
+    max-height:340px;
+    object-fit:cover;
+    display:block;
+    border-radius:6px;
+    border:1px solid var(--line);
+    background:#f2f1ea;
+    margin-bottom:10px;
+  }
+  .mgallery-thumbs{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding-bottom:4px;
+  }
+  .mgallery-thumb{
+    width:64px; height:64px;
+    object-fit:cover;
+    border-radius:4px;
+    border:2px solid transparent;
+    cursor:pointer;
+    flex-shrink:0;
+    opacity:.7;
+    transition:.12s;
+  }
+  .mgallery-thumb:hover{opacity:1;}
+  .mgallery-thumb.active{border-color:var(--gold); opacity:1;}
+
   .mstatus-row{
     display:flex;
     gap:10px;
@@ -642,6 +672,11 @@
       <h2 id="modalNombre">—</h2>
     </div>
     <div class="modal-body">
+      <div class="mgallery" id="mGallery" style="display:none;">
+        <img class="mgallery-main" id="mGalleryMain" src="" alt="Foto del predio">
+        <div class="mgallery-thumbs" id="mGalleryThumbs"></div>
+      </div>
+
       <div class="mstatus-row">
         <div class="mstatus-card" id="cardFoto">
           <div class="lab">Registro fotográfico</div>
@@ -916,10 +951,40 @@ function goPage(p){
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
+function renderGallery(fotos){
+  const gallery = document.getElementById('mGallery');
+  const main = document.getElementById('mGalleryMain');
+  const thumbs = document.getElementById('mGalleryThumbs');
+
+  if(!Array.isArray(fotos) || fotos.length === 0){
+    gallery.style.display = 'none';
+    main.src = '';
+    thumbs.innerHTML = '';
+    return;
+  }
+
+  gallery.style.display = 'block';
+  main.src = fotos[0];
+  thumbs.innerHTML = fotos.map((url, i) =>
+    `<img class="mgallery-thumb${i===0?' active':''}" src="${url}" data-idx="${i}" onclick="selectGalleryPhoto(${i})">`
+  ).join('');
+  thumbs.dataset.fotos = JSON.stringify(fotos);
+}
+
+function selectGalleryPhoto(idx){
+  const thumbs = document.getElementById('mGalleryThumbs');
+  const fotos = JSON.parse(thumbs.dataset.fotos || '[]');
+  if(!fotos[idx]) return;
+  document.getElementById('mGalleryMain').src = fotos[idx];
+  thumbs.querySelectorAll('.mgallery-thumb').forEach((t,i)=> t.classList.toggle('active', i===idx));
+}
+
 function openModal(idx){
   const d = DATA[idx];
   document.getElementById('modalCodigo').textContent = d['CÓDIGO FRV'] || ('Código '+d['CÓDIGO']);
   document.getElementById('modalNombre').textContent = d['NOMBRE BIEN'] || 'Sin nombre registrado';
+
+  renderGallery(d['FOTOS_CLOUDINARY']);
 
   const foto = isYes(d['TIENE FOTO']);
 
