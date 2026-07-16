@@ -191,8 +191,6 @@
     border-color:var(--ink);
     color:#fff;
   }
-  .toggle-btn.active.foto{background:var(--ok); border-color:var(--ok);}
-  .toggle-btn.active.aval{background:var(--gold-deep); border-color:var(--gold-deep);}
 
   .clear-btn{
     padding:10px 14px;
@@ -906,6 +904,11 @@ function render(){
       const cantFotosCloudinary = Array.isArray(d['FOTOS_CLOUDINARY']) ? d['FOTOS_CLOUDINARY'].length : 0;
       const foto = cantFotosCloudinary > 0;
       const aval = isYes(d['TIENE AVALÚO']);
+      let anioAvaluoLabel = 'Sí';
+      if(d['AÑO AVALÚO']){
+        const anio = parseInt(d['AÑO AVALÚO'], 10);
+        anioAvaluoLabel = (Number.isInteger(anio) && anio >= 2000) ? anio : '—';
+      }
       return `
       <tr onclick="openModal(${idx})">
         <td class="td-codigo">${d['CÓDIGO FRV']||'—'}</td>
@@ -916,7 +919,7 @@ function render(){
         <td>${extintoLabel(d['EXTINCIÓN DOMINIO'])}</td>
         <td>${d['ÁREA HA CATASTRO']||'—'}</td>
         <td>${foto ? `<span class="badge si"><span class="dot"></span>Sí · ${cantFotosCloudinary}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>
-        <td>${aval ? `<span class="badge si"><span class="dot"></span>${d['AÑO AVALÚO']||'Sí'}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>
+        <td>${aval ? `<span class="badge si"><span class="dot"></span>${anioAvaluoLabel}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>
       </tr>`;
     }).join('');
   }
