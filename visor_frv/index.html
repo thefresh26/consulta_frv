@@ -903,7 +903,8 @@ function render(){
     cardsContainer.innerHTML = '';
     tbody.innerHTML = pageItems.map(d=>{
       const idx = DATA.indexOf(d);
-      const foto = isYes(d['TIENE FOTO']);
+      const cantFotosCloudinary = Array.isArray(d['FOTOS_CLOUDINARY']) ? d['FOTOS_CLOUDINARY'].length : 0;
+      const foto = cantFotosCloudinary > 0;
       const aval = isYes(d['TIENE AVALÚO']);
       return `
       <tr onclick="openModal(${idx})">
@@ -914,7 +915,7 @@ function render(){
         <td><span class="etapa-pill ${etapaClass(d['ETAPA GESTIÓN'])}">${d['ETAPA GESTIÓN']||'—'}</span></td>
         <td>${extintoLabel(d['EXTINCIÓN DOMINIO'])}</td>
         <td>${d['ÁREA HA CATASTRO']||'—'}</td>
-        <td>${foto ? `<span class="badge si"><span class="dot"></span>Sí · ${d['CANT. FOTOS']||0}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>
+        <td>${foto ? `<span class="badge si"><span class="dot"></span>Sí · ${cantFotosCloudinary}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>
         <td>${aval ? `<span class="badge si"><span class="dot"></span>${d['AÑO AVALÚO']||'Sí'}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>
       </tr>`;
     }).join('');
@@ -993,7 +994,7 @@ function openModal(idx){
   cardFoto.className = 'mstatus-card ' + (foto ? 'ok':'no');
   document.getElementById('mFotoEstado').textContent = foto ? 'Disponible' : 'No registrado';
   document.getElementById('mFotoDetalle').textContent = foto
-    ? `${d['CANT. ÁLBUMES']||0} álbum(es) · ${cantFotosCloudinary} fotos`
+    ? `${cantFotosCloudinary} fotos`
     : 'Sin álbum fotográfico cargado';
 
   document.getElementById('mFmi').textContent = d['FMI'] || 'No aplica';
