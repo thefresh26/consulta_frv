@@ -92,6 +92,27 @@
     letter-spacing:.08em;
   }
 
+  .logout-btn{
+    position:fixed;
+    top:14px;
+    right:20px;
+    z-index:300;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:#fff;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.3);
+    padding:7px 14px;
+    border-radius:4px;
+    cursor:pointer;
+    text-decoration:none;
+  }
+  .logout-btn:hover{
+    background:rgba(255,255,255,.2);
+  }
+
   /* ── TOOLBAR ────────────────────────────────────────────── */
   .toolbar{
     background:var(--paper-2);
@@ -583,6 +604,8 @@
 </style>
 </head>
 <body>
+
+<a href="/logout" class="logout-btn">Cerrar sesión</a>
 
 <header>
   <div class="header-inner">
