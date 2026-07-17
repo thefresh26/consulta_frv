@@ -685,7 +685,6 @@
         <div class="mfield"><div class="lab">Etapa de gestión</div><div class="val" id="mEtapa">—</div></div>
         <div class="mfield"><div class="lab">Sistema administración</div><div class="val" id="mSistema">—</div></div>
         <div class="mfield"><div class="lab">Extinción de dominio</div><div class="val" id="mExtincion">—</div></div>
-        <div class="mfield full"><div class="lab">Álbumes registrados</div><div class="val" id="mAlbumes">—</div></div>
       </div>
 
       <div class="msection-title">Áreas Técnicas</div>
@@ -974,7 +973,6 @@ function openModal(idx){
   document.getElementById('mEtapa').textContent = d['ETAPA GESTIÓN'] || '—';
   document.getElementById('mSistema').textContent = d['SISTEMA ADMON'] || 'No definido';
   document.getElementById('mExtincion').textContent = (d['EXTINCIÓN DOMINIO']||'').toUpperCase()==='SI' ? 'Sí' : 'No';
-  document.getElementById('mAlbumes').textContent = d['ÁLBUMES'] || 'Sin álbumes';
 
   document.getElementById('mAreaHaCatastro').textContent = d['ÁREA HA CATASTRO'] || '—';
   document.getElementById('mAreaHaEscritura').textContent = d['ÁREA HA ESCRITURA'] || '—';
