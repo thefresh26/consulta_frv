@@ -662,7 +662,7 @@
           <th>Extinto</th>
           <th>Área (ha)</th>
           <th>Foto</th>
-          <th>Avalúo</th>
+          <th id="thAvaluo">Avalúo</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -746,6 +746,7 @@
 let DATA = [];
 let filtered = [];
 let currentPage = 1;
+let hayColumnaAvaluo = true;
 const PAGE_SIZE = 50;
 
 const state = { search:'', depto:'', etapa:'', foto:'', aval:'', ext:'', anioAval:'' };
@@ -759,6 +760,8 @@ async function loadData(){
     document.getElementById('resultsCount').textContent = 'No se pudo cargar data.json — colócalo junto a este HTML.';
     return;
   }
+  hayColumnaAvaluo = DATA.some(d => 'AÑO AVALÚO' in d);
+  document.getElementById('thAvaluo').style.display = hayColumnaAvaluo ? '' : 'none';
   populateFilters();
   computeStats();
   applyFilters();
@@ -933,7 +936,7 @@ function render(){
         <td>${extintoLabel(d['EXTINCIÓN DOMINIO'])}</td>
         <td>${d['ÁREA HA CATASTRO']||'—'}</td>
         <td>${foto ? `<span class="badge si"><span class="dot"></span>Sí · ${cantFotosCloudinary}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>
-        <td>${aval ? `<span class="badge si"><span class="dot"></span>${anioAvaluoLabel}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>
+        ${hayColumnaAvaluo ? `<td>${aval ? `<span class="badge si"><span class="dot"></span>${anioAvaluoLabel}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>` : ''}
       </tr>`;
     }).join('');
   }
