@@ -714,8 +714,8 @@
         <div class="mfield"><div class="lab">Extinción de dominio</div><div class="val" id="mExtincion">—</div></div>
       </div>
 
-      <div class="msection-title">Avalúo</div>
-      <div class="mgrid">
+      <div class="msection-title" id="avaluoTitle">Avalúo</div>
+      <div class="mgrid" id="avaluoGrid">
         <div class="mfield"><div class="lab">Valor avalúo (catastral)</div><div class="val" id="mValorAvaluo">—</div></div>
         <div class="mfield"><div class="lab">Con avalúo comercial</div><div class="val" id="mConAvaluoComerc">—</div></div>
         <div class="mfield"><div class="lab">Año avalúo</div><div class="val" id="mAnioAvaluo">—</div></div>
@@ -1021,11 +1021,19 @@ function openModal(idx){
   document.getElementById('mSistema').textContent = d['SISTEMA ADMON'] || 'No definido';
   document.getElementById('mExtincion').textContent = (d['EXTINCIÓN DOMINIO']||'').toUpperCase()==='SI' ? 'Sí' : 'No';
 
-  document.getElementById('mValorAvaluo').textContent = fmtMoney(d['VALOR AVALÚO']);
-  document.getElementById('mConAvaluoComerc').textContent = d['CON AVALÚO COMERC.'] || '—';
-  document.getElementById('mAnioAvaluo').textContent = d['AÑO AVALÚO'] || '—';
-  document.getElementById('mTipoAvaluo').textContent = d['TIPO AVALÚO'] || '—';
-  document.getElementById('mFechaAvaluo').textContent = d['FECHA AVALÚO'] || '—';
+  const tieneDatosAvaluo = [d['VALOR AVALÚO'], d['AÑO AVALÚO'], d['TIPO AVALÚO'], d['FECHA AVALÚO']]
+    .some(v => v !== undefined && v !== null && String(v).trim() !== '');
+
+  document.getElementById('avaluoTitle').style.display = tieneDatosAvaluo ? '' : 'none';
+  document.getElementById('avaluoGrid').style.display = tieneDatosAvaluo ? '' : 'none';
+
+  if(tieneDatosAvaluo){
+    document.getElementById('mValorAvaluo').textContent = fmtMoney(d['VALOR AVALÚO']);
+    document.getElementById('mConAvaluoComerc').textContent = d['CON AVALÚO COMERC.'] || '—';
+    document.getElementById('mAnioAvaluo').textContent = d['AÑO AVALÚO'] || '—';
+    document.getElementById('mTipoAvaluo').textContent = d['TIPO AVALÚO'] || '—';
+    document.getElementById('mFechaAvaluo').textContent = d['FECHA AVALÚO'] || '—';
+  }
 
   document.getElementById('mAreaHaCatastro').textContent = d['ÁREA HA CATASTRO'] || '—';
   document.getElementById('mAreaHaEscritura').textContent = d['ÁREA HA ESCRITURA'] || '—';
