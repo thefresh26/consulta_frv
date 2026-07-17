@@ -607,6 +607,7 @@
     </div>
     <select id="filterDepto"><option value="">Departamento (todos)</option></select>
     <select id="filterEtapa"><option value="">Etapa (todas)</option></select>
+    <select id="filterAnioAval"><option value="">Año avalúo (todos)</option></select>
     <div class="toggle-group">
       <button class="toggle-btn foto" data-filter="foto" data-val="">Foto: todos</button>
     </div>
@@ -716,7 +717,7 @@ let filtered = [];
 let currentPage = 1;
 const PAGE_SIZE = 50;
 
-const state = { search:'', depto:'', etapa:'', foto:'', aval:'', ext:'' };
+const state = { search:'', depto:'', etapa:'', foto:'', aval:'', ext:'', anioAval:'' };
 
 async function loadData(){
   try{
@@ -748,6 +749,14 @@ function populateFilters(){
     const o = document.createElement('option');
     o.value = e; o.textContent = e.charAt(0)+e.slice(1).toLowerCase();
     selE.appendChild(o);
+  });
+
+  const anios = [...new Set(DATA.map(d=>parseInt(d['AÑO AVALÚO'], 10)).filter(a=>a>2000))].sort((a,b)=>b-a);
+  const selA = document.getElementById('filterAnioAval');
+  anios.forEach(a=>{
+    const o = document.createElement('option');
+    o.value = a; o.textContent = a;
+    selA.appendChild(o);
   });
 }
 
@@ -792,6 +801,7 @@ function applyFilters(){
     const esExtinto = (d['EXTINCIÓN DOMINIO']||'').toString().trim().toUpperCase() === 'SI';
     if(state.ext === 'si' && !esExtinto) return false;
     if(state.ext === 'no' && esExtinto) return false;
+    if(state.anioAval && String(parseInt(d['AÑO AVALÚO'], 10)) !== state.anioAval) return false;
     return true;
   });
 
@@ -1013,6 +1023,10 @@ document.getElementById('filterEtapa').addEventListener('change', e=>{
   state.etapa = e.target.value;
   applyFilters();
 });
+document.getElementById('filterAnioAval').addEventListener('change', e=>{
+  state.anioAval = e.target.value;
+  applyFilters();
+});
 document.querySelectorAll('.toggle-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     const filter = btn.dataset.filter;
@@ -1032,10 +1046,11 @@ document.querySelectorAll('.toggle-btn').forEach(btn=>{
 });
 
 document.getElementById('clearBtn').addEventListener('click', ()=>{
-  state.search=''; state.depto=''; state.etapa=''; state.foto=''; state.aval=''; state.ext='';
+  state.search=''; state.depto=''; state.etapa=''; state.foto=''; state.aval=''; state.ext=''; state.anioAval='';
   document.getElementById('searchInput').value='';
   document.getElementById('filterDepto').value='';
   document.getElementById('filterEtapa').value='';
+  document.getElementById('filterAnioAval').value='';
   document.querySelectorAll('.toggle-btn').forEach(b=>{
     b.classList.remove('active');
     b.textContent = b.classList.contains('foto') ? 'Foto: todos' : b.classList.contains('aval') ? 'Avalúo: todos' : 'Extinto: todos';
