@@ -714,6 +714,15 @@
         <div class="mfield"><div class="lab">Extinción de dominio</div><div class="val" id="mExtincion">—</div></div>
       </div>
 
+      <div class="msection-title">Avalúo</div>
+      <div class="mgrid">
+        <div class="mfield"><div class="lab">Valor avalúo (catastral)</div><div class="val" id="mValorAvaluo">—</div></div>
+        <div class="mfield"><div class="lab">Con avalúo comercial</div><div class="val" id="mConAvaluoComerc">—</div></div>
+        <div class="mfield"><div class="lab">Año avalúo</div><div class="val" id="mAnioAvaluo">—</div></div>
+        <div class="mfield"><div class="lab">Tipo avalúo</div><div class="val" id="mTipoAvaluo">—</div></div>
+        <div class="mfield"><div class="lab">Fecha avalúo</div><div class="val" id="mFechaAvaluo">—</div></div>
+      </div>
+
       <div class="msection-title">Áreas Técnicas</div>
       <div class="mgrid">
         <div class="mfield"><div class="lab">Área Ha Catastro</div><div class="val" id="mAreaHaCatastro">—</div></div>
@@ -725,7 +734,6 @@
         <div class="mfield"><div class="lab">Área construida</div><div class="val" id="mAreaConstruida">—</div></div>
         <div class="mfield"><div class="lab">Estado folio</div><div class="val" id="mEstadoFolio">—</div></div>
         <div class="mfield"><div class="lab">Estado actual bien</div><div class="val" id="mEstadoActualBien">—</div></div>
-        <div class="mfield"><div class="lab">Con avalúo comercial</div><div class="val" id="mConAvaluoComerc">—</div></div>
         <div class="mfield"><div class="lab">Fecha apertura</div><div class="val" id="mFechaApertura">—</div></div>
         <div class="mfield"><div class="lab">Fecha inspección</div><div class="val" id="mFechaInspecc">—</div></div>
         <div class="mfield"><div class="lab">N° catastral</div><div class="val" id="mNCatastral">—</div></div>
@@ -1013,6 +1021,12 @@ function openModal(idx){
   document.getElementById('mSistema').textContent = d['SISTEMA ADMON'] || 'No definido';
   document.getElementById('mExtincion').textContent = (d['EXTINCIÓN DOMINIO']||'').toUpperCase()==='SI' ? 'Sí' : 'No';
 
+  document.getElementById('mValorAvaluo').textContent = fmtMoney(d['VALOR AVALÚO']);
+  document.getElementById('mConAvaluoComerc').textContent = d['CON AVALÚO COMERC.'] || '—';
+  document.getElementById('mAnioAvaluo').textContent = d['AÑO AVALÚO'] || '—';
+  document.getElementById('mTipoAvaluo').textContent = d['TIPO AVALÚO'] || '—';
+  document.getElementById('mFechaAvaluo').textContent = d['FECHA AVALÚO'] || '—';
+
   document.getElementById('mAreaHaCatastro').textContent = d['ÁREA HA CATASTRO'] || '—';
   document.getElementById('mAreaHaEscritura').textContent = d['ÁREA HA ESCRITURA'] || '—';
   document.getElementById('mAreaHaMatricula').textContent = d['ÁREA HA MATRÍCULA'] || '—';
@@ -1022,7 +1036,6 @@ function openModal(idx){
   document.getElementById('mAreaConstruida').textContent = d['ÁREA CONSTRUIDA'] || '—';
   document.getElementById('mEstadoFolio').textContent = d['ESTADO FOLIO'] || '—';
   document.getElementById('mEstadoActualBien').textContent = d['ESTADO ACTUAL BIEN'] || '—';
-  document.getElementById('mConAvaluoComerc').textContent = d['CON AVALÚO COMERC.'] || '—';
   document.getElementById('mFechaApertura').textContent = d['FECHA APERTURA'] || '—';
   document.getElementById('mFechaInspecc').textContent = d['FECHA INSPECC.'] || '—';
   document.getElementById('mNCatastral').textContent = d['N° CATASTRAL'] || '—';
