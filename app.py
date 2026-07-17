@@ -1,13 +1,14 @@
 """
-app.py — Servidor Flask con login por formulario.
-Sirve el visor FRV protegido por sesión. /data.json expone el JSON
-completo, sin filtrar campos, para cualquier usuario autenticado.
+app.py — Servidor Flask con login por formulario y control de acceso por rol.
+Sirve el visor FRV protegido por sesión. El rol determina qué campos de
+avalúo se incluyen en /data.json.
 
 Variables de entorno necesarias en Render:
   SECRET_KEY - clave secreta para firmar la sesión de Flask
 """
 
 import os
+import json
 from functools import wraps
 from flask import Flask, send_from_directory, request, session, redirect, url_for, Response
 
@@ -18,6 +19,16 @@ USUARIOS = {
     "juridica2026":  {"password": "2026", "rol": "juridica"},
     "comercial2026": {"password": "2026", "rol": "comercial"},
 }
+
+CAMPOS_RESTRINGIDOS_COMERCIAL = [
+    "VALOR AVALÚO",
+    "AÑO AVALÚO",
+    "TIPO AVALÚO",
+    "FECHA AVALÚO",
+    "VALOR AVALÚO COMERCIAL",
+    "AÑO AVALÚO COMERCIAL",
+    "FECHA AVALÚO COMERCIAL",
+]
 
 LOGIN_HTML = """<!doctype html>
 <html lang="es">
@@ -93,9 +104,15 @@ def index():
 @requires_auth
 def data_json():
     with open(os.path.join("visor_frv", "data.json"), "r", encoding="utf-8") as f:
-        data = f.read()
+        data = json.load(f)
 
-    return Response(data, mimetype="application/json")
+    if session.get("rol") == "comercial":
+        data = [
+            {k: v for k, v in registro.items() if k not in CAMPOS_RESTRINGIDOS_COMERCIAL}
+            for registro in data
+        ]
+
+    return Response(json.dumps(data, ensure_ascii=False), mimetype="application/json")
 
 
 @app.route("/<path:filename>")
