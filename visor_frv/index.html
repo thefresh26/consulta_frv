@@ -635,7 +635,10 @@
       <button class="toggle-btn foto" data-filter="foto" data-val="">Foto: todos</button>
     </div>
     <div class="toggle-group">
-      <button class="toggle-btn aval" data-filter="aval" data-val="">Avalúo: todos</button>
+      <button class="toggle-btn avalCat" data-filter="avalCat" data-val="">Aval. Catastral: todos</button>
+    </div>
+    <div class="toggle-group">
+      <button class="toggle-btn avalCom" data-filter="avalCom" data-val="">Aval. Comercial: todos</button>
     </div>
     <div class="toggle-group">
       <button class="toggle-btn ext" data-filter="ext" data-val="">Extinto: todos</button>
@@ -749,7 +752,7 @@ let currentPage = 1;
 let hayColumnaAvaluo = true;
 const PAGE_SIZE = 50;
 
-const state = { search:'', depto:'', etapa:'', foto:'', aval:'', ext:'', anioAval:'' };
+const state = { search:'', depto:'', etapa:'', foto:'', avalCat:'', avalCom:'', ext:'', anioAval:'' };
 
 async function loadData(){
   try{
@@ -809,6 +812,11 @@ function tieneAvaluoValido(d){
   return Number.isInteger(anio) && anio > 2000;
 }
 
+function tieneAvaluoComercialValido(d){
+  const anio = parseInt(d['AÑO AVALÚO COMERCIAL'], 10);
+  return Number.isInteger(anio) && anio > 2000;
+}
+
 function tieneFotoValida(d){
   return Array.isArray(d['FOTOS_CLOUDINARY']) && d['FOTOS_CLOUDINARY'].length > 0;
 }
@@ -838,8 +846,10 @@ function applyFilters(){
     if(state.etapa && d['ETAPA GESTIÓN'] !== state.etapa) return false;
     if(state.foto === 'si' && !tieneFotoValida(d)) return false;
     if(state.foto === 'no' && tieneFotoValida(d)) return false;
-    if(state.aval === 'si' && !tieneAvaluoValido(d)) return false;
-    if(state.aval === 'no' && tieneAvaluoValido(d)) return false;
+    if(state.avalCat === 'si' && !tieneAvaluoValido(d)) return false;
+    if(state.avalCat === 'no' && tieneAvaluoValido(d)) return false;
+    if(state.avalCom === 'si' && !tieneAvaluoComercialValido(d)) return false;
+    if(state.avalCom === 'no' && tieneAvaluoComercialValido(d)) return false;
     const esExtinto = (d['EXTINCIÓN DOMINIO']||'').toString().trim().toUpperCase() === 'SI';
     if(state.ext === 'si' && !esExtinto) return false;
     if(state.ext === 'no' && esExtinto) return false;
@@ -1093,22 +1103,27 @@ document.querySelectorAll('.toggle-btn').forEach(btn=>{
     btn.classList.toggle('active', next !== '');
     btn.textContent = filter === 'foto'
       ? (next==='' ? 'Foto: todos' : next==='si' ? 'Foto: sí ✓' : 'Foto: no ✕')
-      : filter === 'aval'
-      ? (next==='' ? 'Avalúo: todos' : next==='si' ? 'Avalúo: sí ✓' : 'Avalúo: no ✕')
+      : filter === 'avalCat'
+      ? (next==='' ? 'Aval. Catastral: todos' : next==='si' ? 'Aval. Catastral: sí ✓' : 'Aval. Catastral: no ✕')
+      : filter === 'avalCom'
+      ? (next==='' ? 'Aval. Comercial: todos' : next==='si' ? 'Aval. Comercial: sí ✓' : 'Aval. Comercial: no ✕')
       : (next==='' ? 'Extinto: todos' : next==='si' ? 'Extinto: sí ✓' : 'Extinto: no ✕');
     applyFilters();
   });
 });
 
 document.getElementById('clearBtn').addEventListener('click', ()=>{
-  state.search=''; state.depto=''; state.etapa=''; state.foto=''; state.aval=''; state.ext=''; state.anioAval='';
+  state.search=''; state.depto=''; state.etapa=''; state.foto=''; state.avalCat=''; state.avalCom=''; state.ext=''; state.anioAval='';
   document.getElementById('searchInput').value='';
   document.getElementById('filterDepto').value='';
   document.getElementById('filterEtapa').value='';
   document.getElementById('filterAnioAval').value='';
   document.querySelectorAll('.toggle-btn').forEach(b=>{
     b.classList.remove('active');
-    b.textContent = b.classList.contains('foto') ? 'Foto: todos' : b.classList.contains('aval') ? 'Avalúo: todos' : 'Extinto: todos';
+    b.textContent = b.classList.contains('foto') ? 'Foto: todos'
+      : b.classList.contains('avalCat') ? 'Aval. Catastral: todos'
+      : b.classList.contains('avalCom') ? 'Aval. Comercial: todos'
+      : 'Extinto: todos';
   });
   applyFilters();
 });
