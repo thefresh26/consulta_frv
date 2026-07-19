@@ -796,7 +796,7 @@ function populateFilters(){
 
 function computeStats(){
   document.getElementById('stat-total').textContent = DATA.length.toLocaleString('es-CO');
-  const foto = DATA.filter(d => (d['TIENE FOTO']||'').toUpperCase().startsWith('S')).length;
+  const foto = DATA.filter(tieneFotoValida).length;
   const aval = DATA.filter(tieneAvaluoValido).length;
   document.getElementById('stat-foto').textContent = foto.toLocaleString('es-CO');
   document.getElementById('stat-aval').textContent = aval.toLocaleString('es-CO');
@@ -807,6 +807,10 @@ function isYes(v){ return (v||'').toString().trim().toUpperCase().startsWith('S'
 function tieneAvaluoValido(d){
   const anio = parseInt(d['AÑO AVALÚO'], 10);
   return Number.isInteger(anio) && anio > 2000;
+}
+
+function tieneFotoValida(d){
+  return Array.isArray(d['FOTOS_CLOUDINARY']) && d['FOTOS_CLOUDINARY'].length > 0;
 }
 
 function extintoLabel(v){
@@ -832,9 +836,8 @@ function applyFilters(){
     }
     if(state.depto && d['DEPARTAMENTO'] !== state.depto) return false;
     if(state.etapa && d['ETAPA GESTIÓN'] !== state.etapa) return false;
-    const tieneFotoCloudinary = Array.isArray(d['FOTOS_CLOUDINARY']) && d['FOTOS_CLOUDINARY'].length > 0;
-    if(state.foto === 'si' && !tieneFotoCloudinary) return false;
-    if(state.foto === 'no' && tieneFotoCloudinary) return false;
+    if(state.foto === 'si' && !tieneFotoValida(d)) return false;
+    if(state.foto === 'no' && tieneFotoValida(d)) return false;
     if(state.aval === 'si' && !tieneAvaluoValido(d)) return false;
     if(state.aval === 'no' && tieneAvaluoValido(d)) return false;
     const esExtinto = (d['EXTINCIÓN DOMINIO']||'').toString().trim().toUpperCase() === 'SI';
@@ -887,7 +890,7 @@ function render(){
     tbody.innerHTML = '';
     cardsContainer.innerHTML = pageItems.map(d=>{
       const idx = DATA.indexOf(d);
-      const foto = isYes(d['TIENE FOTO']);
+      const foto = tieneFotoValida(d);
       const aval = tieneAvaluoValido(d);
       const tipo = (d['TIPO BIEN']||'').split(' - ').slice(1).join(' · ');
       const ubicacion = [d['MUNICIPIO'], d['DEPARTAMENTO']].filter(Boolean).join(', ');
