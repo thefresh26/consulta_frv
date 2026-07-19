@@ -612,12 +612,12 @@
     <div>
       <div class="brand-eyebrow">Fondo para la Reparación a las Víctimas</div>
       <h1 class="brand-title">Consulta de Bienes FRV</h1>
-      <div class="brand-sub">Registro de inventario · fotografías · avalúos</div>
+      <div class="brand-sub" id="brandSub">Registro de inventario · fotografías · avalúos</div>
     </div>
     <div class="header-stats">
       <div class="hstat"><span class="n" id="stat-total">—</span><span class="l">Predios</span></div>
       <div class="hstat"><span class="n" id="stat-foto">—</span><span class="l">Con foto</span></div>
-      <div class="hstat"><span class="n" id="stat-aval">—</span><span class="l">Con avalúo</span></div>
+      <div class="hstat" id="statAvalGroup"><span class="n" id="stat-aval">—</span><span class="l">Con avalúo</span></div>
     </div>
   </div>
 </header>
@@ -766,14 +766,17 @@ async function loadData(){
     document.getElementById('resultsCount').textContent = 'No se pudo cargar data.json — colócalo junto a este HTML.';
     return;
   }
-  hayColumnaAvaluo = DATA.some(d => 'AÑO AVALÚO' in d);
-  document.getElementById('thAvaluo').style.display = hayColumnaAvaluo ? '' : 'none';
-
   const primerPredio = DATA[0] || {};
-  const hayFiltrosAvaluo = String(primerPredio['AÑO AVALÚO'] || '').trim() !== '';
-  document.getElementById('filterAnioAval').style.display = hayFiltrosAvaluo ? '' : 'none';
-  document.getElementById('avalCatGroup').style.display = hayFiltrosAvaluo ? '' : 'none';
-  document.getElementById('avalComGroup').style.display = hayFiltrosAvaluo ? '' : 'none';
+  hayColumnaAvaluo = String(primerPredio['AÑO AVALÚO'] || '').trim() !== '';
+
+  document.getElementById('thAvaluo').style.display = hayColumnaAvaluo ? '' : 'none';
+  document.getElementById('filterAnioAval').style.display = hayColumnaAvaluo ? '' : 'none';
+  document.getElementById('avalCatGroup').style.display = hayColumnaAvaluo ? '' : 'none';
+  document.getElementById('avalComGroup').style.display = hayColumnaAvaluo ? '' : 'none';
+  document.getElementById('statAvalGroup').style.display = hayColumnaAvaluo ? '' : 'none';
+  document.getElementById('brandSub').textContent = hayColumnaAvaluo
+    ? 'Registro de inventario · fotografías · avalúos'
+    : 'Registro de inventario · fotografías';
 
   populateFilters();
   computeStats();
