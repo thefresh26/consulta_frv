@@ -634,10 +634,10 @@
     <div class="toggle-group">
       <button class="toggle-btn foto" data-filter="foto" data-val="">Foto: todos</button>
     </div>
-    <div class="toggle-group">
+    <div class="toggle-group" id="avalCatGroup">
       <button class="toggle-btn avalCat" data-filter="avalCat" data-val="">Aval. Catastral: todos</button>
     </div>
-    <div class="toggle-group">
+    <div class="toggle-group" id="avalComGroup">
       <button class="toggle-btn avalCom" data-filter="avalCom" data-val="">Aval. Comercial: todos</button>
     </div>
     <div class="toggle-group">
@@ -768,6 +768,13 @@ async function loadData(){
   }
   hayColumnaAvaluo = DATA.some(d => 'AÑO AVALÚO' in d);
   document.getElementById('thAvaluo').style.display = hayColumnaAvaluo ? '' : 'none';
+
+  const primerPredio = DATA[0] || {};
+  const hayFiltrosAvaluo = String(primerPredio['AÑO AVALÚO'] || '').trim() !== '';
+  document.getElementById('filterAnioAval').style.display = hayFiltrosAvaluo ? '' : 'none';
+  document.getElementById('avalCatGroup').style.display = hayFiltrosAvaluo ? '' : 'none';
+  document.getElementById('avalComGroup').style.display = hayFiltrosAvaluo ? '' : 'none';
+
   populateFilters();
   computeStats();
   applyFilters();
