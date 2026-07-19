@@ -724,6 +724,9 @@
         <div class="mfield"><div class="lab">Año avalúo</div><div class="val" id="mAnioAvaluo">—</div></div>
         <div class="mfield"><div class="lab">Tipo avalúo</div><div class="val" id="mTipoAvaluo">—</div></div>
         <div class="mfield"><div class="lab">Fecha avalúo</div><div class="val" id="mFechaAvaluo">—</div></div>
+        <div class="mfield" id="mValorAvaluoComercialField"><div class="lab">Valor avalúo (comercial)</div><div class="val" id="mValorAvaluoComercial">—</div></div>
+        <div class="mfield" id="mAnioAvaluoComercialField"><div class="lab">Año avalúo comercial</div><div class="val" id="mAnioAvaluoComercial">—</div></div>
+        <div class="mfield" id="mFechaAvaluoComercialField"><div class="lab">Fecha avalúo comercial</div><div class="val" id="mFechaAvaluoComercial">—</div></div>
       </div>
 
       <div class="msection-title">Áreas Técnicas</div>
@@ -1042,8 +1045,12 @@ function openModal(idx){
   document.getElementById('mSistema').textContent = d['SISTEMA ADMON'] || 'No definido';
   document.getElementById('mExtincion').textContent = (d['EXTINCIÓN DOMINIO']||'').toUpperCase()==='SI' ? 'Sí' : 'No';
 
-  const tieneDatosAvaluo = [d['VALOR AVALÚO'], d['AÑO AVALÚO'], d['TIPO AVALÚO'], d['FECHA AVALÚO']]
-    .some(v => v !== undefined && v !== null && String(v).trim() !== '');
+  const tieneValor = v => v !== undefined && v !== null && String(v).trim() !== '';
+
+  const tieneDatosAvaluo = [
+    d['VALOR AVALÚO'], d['AÑO AVALÚO'], d['TIPO AVALÚO'], d['FECHA AVALÚO'],
+    d['VALOR AVALÚO COMERCIAL'], d['AÑO AVALÚO COMERCIAL'], d['FECHA AVALÚO COMERCIAL']
+  ].some(tieneValor);
 
   document.getElementById('avaluoTitle').style.display = tieneDatosAvaluo ? '' : 'none';
   document.getElementById('avaluoGrid').style.display = tieneDatosAvaluo ? '' : 'none';
@@ -1054,6 +1061,15 @@ function openModal(idx){
     document.getElementById('mAnioAvaluo').textContent = d['AÑO AVALÚO'] || '—';
     document.getElementById('mTipoAvaluo').textContent = d['TIPO AVALÚO'] || '—';
     document.getElementById('mFechaAvaluo').textContent = d['FECHA AVALÚO'] || '—';
+
+    document.getElementById('mValorAvaluoComercialField').style.display = tieneValor(d['VALOR AVALÚO COMERCIAL']) ? '' : 'none';
+    document.getElementById('mValorAvaluoComercial').textContent = fmtMoney(d['VALOR AVALÚO COMERCIAL']);
+
+    document.getElementById('mAnioAvaluoComercialField').style.display = tieneValor(d['AÑO AVALÚO COMERCIAL']) ? '' : 'none';
+    document.getElementById('mAnioAvaluoComercial').textContent = d['AÑO AVALÚO COMERCIAL'] || '—';
+
+    document.getElementById('mFechaAvaluoComercialField').style.display = tieneValor(d['FECHA AVALÚO COMERCIAL']) ? '' : 'none';
+    document.getElementById('mFechaAvaluoComercial').textContent = d['FECHA AVALÚO COMERCIAL'] || '—';
   }
 
   document.getElementById('mAreaHaCatastro').textContent = d['ÁREA HA CATASTRO'] || '—';
