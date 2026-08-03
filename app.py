@@ -4,10 +4,20 @@ Sirve el visor FRV protegido por sesión. El rol determina qué campos de
 avalúo se incluyen en /data.json.
 
 Variables de entorno necesarias en Render:
-  SECRET_KEY - clave secreta para firmar la sesión de Flask
+  SECRET_KEY             - clave secreta para firmar la sesión de Flask
+  FRV_JURIDICA_PASSWORD  - contraseña del usuario 'juridica2026'
+  FRV_COMERCIAL_PASSWORD - contraseña del usuario 'comercial2026'
+
+Antes las contraseñas estaban escritas directo en este archivo (visible
+para cualquiera con acceso al repositorio, que es público). Ahora se leen
+de variables de entorno, configuradas en Render (Settings > Environment).
+En local (fuera de Render), si no defines esas variables, se usan valores
+de prueba obvios (ver DEV_FALLBACK_* abajo) SOLO para que el servidor
+arranque; con esos no vas a poder replicar el acceso real de producción.
 """
 
 import os
+import sys
 import json
 from functools import wraps
 from flask import Flask, send_from_directory, request, session, redirect, url_for, Response
@@ -15,9 +25,23 @@ from flask import Flask, send_from_directory, request, session, redirect, url_fo
 app = Flask(__name__, static_folder="visor_frv", static_url_path="")
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
 
+DEV_FALLBACK_JURIDICA = "dev-only-change-me"
+DEV_FALLBACK_COMERCIAL = "dev-only-change-me"
+
+_pw_juridica = os.environ.get("FRV_JURIDICA_PASSWORD")
+_pw_comercial = os.environ.get("FRV_COMERCIAL_PASSWORD")
+
+if not _pw_juridica or not _pw_comercial:
+    print(
+        "[AVISO] Falta FRV_JURIDICA_PASSWORD y/o FRV_COMERCIAL_PASSWORD en las "
+        "variables de entorno. Usando contraseñas de desarrollo (NO sirven en "
+        "produccion). Configuralas en Render: Settings > Environment.",
+        file=sys.stderr,
+    )
+
 USUARIOS = {
-    "juridica2026":  {"password": "2026", "rol": "juridica"},
-    "comercial2026": {"password": "2026", "rol": "comercial"},
+    "juridica2026":  {"password": _pw_juridica or DEV_FALLBACK_JURIDICA, "rol": "juridica"},
+    "comercial2026": {"password": _pw_comercial or DEV_FALLBACK_COMERCIAL, "rol": "comercial"},
 }
 
 CAMPOS_RESTRINGIDOS_COMERCIAL = [
