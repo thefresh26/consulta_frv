@@ -3,45 +3,37 @@ app.py — Servidor Flask con login por formulario y control de acceso por rol.
 Sirve el visor FRV protegido por sesión. El rol determina qué campos de
 avalúo se incluyen en /data.json.
 
-Variables de entorno necesarias en Render:
-  SECRET_KEY             - clave secreta para firmar la sesión de Flask
-  FRV_JURIDICA_PASSWORD  - contraseña del usuario 'juridica2026'
-  FRV_COMERCIAL_PASSWORD - contraseña del usuario 'comercial2026'
+El login ya NO valida contra un diccionario local de usuarios/contraseñas:
+se valida contra Supabase Auth (el mismo proyecto que usan Vista_inmuebles_SAE
+y Vista_Inmuebles), reutilizando las cuentas juridica2026 y comercial2026.
+Así, la trazabilidad y el control de usuarios queda centralizado en un solo
+lugar (Supabase) en vez de repartido en cada proyecto.
 
-Antes las contraseñas estaban escritas directo en este archivo (visible
-para cualquiera con acceso al repositorio, que es público). Ahora se leen
-de variables de entorno, configuradas en Render (Settings > Environment).
-En local (fuera de Render), si no defines esas variables, se usan valores
-de prueba obvios (ver DEV_FALLBACK_* abajo) SOLO para que el servidor
-arranque; con esos no vas a poder replicar el acceso real de producción.
+Variables de entorno necesarias en Render:
+  SECRET_KEY                - clave para firmar la sesión de Flask
+  SUPABASE_URL               - URL del proyecto Supabase
+  SUPABASE_ANON_KEY          - anon key
+  SUPABASE_SERVICE_ROLE_KEY  - service_role key (solo para guardar logs)
 """
 
 import os
-import sys
 import json
+import requests
 from functools import wraps
 from flask import Flask, send_from_directory, request, session, redirect, url_for, Response
 
 app = Flask(__name__, static_folder="visor_frv", static_url_path="")
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
 
-DEV_FALLBACK_JURIDICA = "dev-only-change-me"
-DEV_FALLBACK_COMERCIAL = "dev-only-change-me"
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
+SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY", "")
+SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 
-_pw_juridica = os.environ.get("FRV_JURIDICA_PASSWORD")
-_pw_comercial = os.environ.get("FRV_COMERCIAL_PASSWORD")
-
-if not _pw_juridica or not _pw_comercial:
-    print(
-        "[AVISO] Falta FRV_JURIDICA_PASSWORD y/o FRV_COMERCIAL_PASSWORD en las "
-        "variables de entorno. Usando contraseñas de desarrollo (NO sirven en "
-        "produccion). Configuralas en Render: Settings > Environment.",
-        file=sys.stderr,
-    )
-
-USUARIOS = {
-    "juridica2026":  {"password": _pw_juridica or DEV_FALLBACK_JURIDICA, "rol": "juridica"},
-    "comercial2026": {"password": _pw_comercial or DEV_FALLBACK_COMERCIAL, "rol": "comercial"},
+# Mapeo usuario corto -> correo real en Supabase Auth (mismo patrón que los
+# otros visores, para que el login se siga sintiendo igual que antes).
+USER_EMAILS = {
+    "juridica2026":  "juridica2026@sae-inmuebles.app",
+    "comercial2026": "comercial2026@sae-inmuebles.app",
 }
 
 CAMPOS_RESTRINGIDOS_COMERCIAL = [
@@ -88,6 +80,30 @@ LOGIN_HTML = """<!doctype html>
 """
 
 
+def obtener_ip_cliente():
+    xff = request.headers.get("X-Forwarded-For", "")
+    if xff:
+        return xff.split(",")[0].strip()
+    return request.remote_addr
+
+
+def registrar_log(email, accion, detalle, ip=None):
+    """Mejor esfuerzo: si falla el log, no interrumpe el uso normal de la app."""
+    try:
+        requests.post(
+            f"{SUPABASE_URL}/rest/v1/logs_acceso_frv",
+            headers={
+                "apikey": SUPABASE_SERVICE_ROLE_KEY,
+                "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={"usuario_email": email, "accion": accion, "detalle": detalle, "ip_address": ip},
+            timeout=5,
+        )
+    except Exception:
+        pass
+
+
 def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -102,13 +118,27 @@ def login():
     if request.method == "GET":
         return LOGIN_HTML.replace("__ERROR__", "")
 
-    username = request.form.get("username", "")
+    username = request.form.get("username", "").strip()
     password = request.form.get("password", "")
-    usuario = USUARIOS.get(username)
+    email = USER_EMAILS.get(username, username)
 
-    if usuario and usuario["password"] == password:
+    r = requests.post(
+        f"{SUPABASE_URL}/auth/v1/token?grant_type=password",
+        headers={"apikey": SUPABASE_ANON_KEY, "Content-Type": "application/json"},
+        json={"email": email, "password": password},
+        timeout=10,
+    )
+
+    if r.status_code == 200:
+        data = r.json()
+        user = data.get("user", {})
+        rol = (user.get("user_metadata") or {}).get("role", "comercial")
+
         session["usuario"] = username
-        session["rol"] = usuario["rol"]
+        session["email"] = email
+        session["rol"] = rol
+
+        registrar_log(email, "login", None, obtener_ip_cliente())
         return redirect(url_for("index"))
 
     error_html = '<div class="error">Usuario o contraseña incorrectos.</div>'
@@ -117,6 +147,14 @@ def login():
 
 @app.route("/logout")
 def logout():
+    detalle = request.args.get("motivo")
+    if session.get("email"):
+        registrar_log(
+            session["email"],
+            "logout_inactividad" if detalle == "inactividad" else "logout",
+            None,
+            obtener_ip_cliente(),
+        )
     session.clear()
     return redirect(url_for("login"))
 
@@ -139,6 +177,7 @@ def data_json():
             for registro in data
         ]
 
+    registrar_log(session.get("email"), "consulta_datos", None, obtener_ip_cliente())
     return Response(json.dumps(data, ensure_ascii=False), mimetype="application/json")
 
 
