@@ -443,24 +443,26 @@
   }
 
   .modal-actions{
-    display:flex; gap:10px;
-    border-top:1px solid var(--line);
-    padding-top:18px;
+    display:flex;
+    margin-bottom:22px;
   }
   .btn-primary{
-    flex:1;
-    padding:12px;
-    background:var(--ink);
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 16px;
+    background:#375623;
     color:#fff;
-    text-align:center;
+    text-align:left;
     text-decoration:none;
-    border-radius:4px;
+    border-radius:6px;
     font-size:13px;
     font-weight:600;
     border:none;
     cursor:pointer;
+    transition:background .15s;
   }
-  .btn-primary:hover{background:var(--gold-deep);}
+  .btn-primary:hover{background:#4f7a34;}
 
   /* ── FOOTER ─────────────────────────────────────────────── */
   footer{
@@ -539,8 +541,6 @@
     .modal-close{width:44px; height:44px;}
     .modal-body{padding:20px 18px 24px;}
     .mgrid{grid-template-columns:1fr;}
-    .modal-actions{flex-direction:column;}
-    .btn-primary{min-height:44px; display:flex; align-items:center; justify-content:center;}
 
     /* Paginación */
     .page-btn{min-height:44px; padding:8px 12px;}
@@ -644,7 +644,7 @@
     </div>
     <div class="modal-body">
       <div class="modal-actions" id="mSharepointActions" style="display:none;">
-        <a class="btn-primary" id="mSharepointLink" href="#" target="_blank" rel="noopener">Ver fotos en SharePoint</a>
+        <a class="btn-primary" id="mSharepointLink" href="#" target="_blank" rel="noopener">📁 Ver fotos en SharePoint</a>
       </div>
 
       <div class="mgrid">
