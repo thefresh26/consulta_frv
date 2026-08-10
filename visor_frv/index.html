@@ -442,57 +442,6 @@
     margin-bottom:14px;
   }
 
-  .mgallery{margin-bottom:22px;}
-  .mgallery-main{
-    width:100%;
-    max-height:340px;
-    object-fit:cover;
-    display:block;
-    border-radius:6px;
-    border:1px solid var(--line);
-    background:#f2f1ea;
-    margin-bottom:10px;
-  }
-  .mgallery-thumbs{
-    display:flex;
-    gap:8px;
-    overflow-x:auto;
-    padding-bottom:4px;
-  }
-  .mgallery-thumb{
-    width:64px; height:64px;
-    object-fit:cover;
-    border-radius:4px;
-    border:2px solid transparent;
-    cursor:pointer;
-    flex-shrink:0;
-    opacity:.7;
-    transition:.12s;
-  }
-  .mgallery-thumb:hover{opacity:1;}
-  .mgallery-thumb.active{border-color:var(--gold); opacity:1;}
-
-  .mstatus-row{
-    display:flex;
-    gap:10px;
-    margin-bottom:22px;
-  }
-  .mstatus-card{
-    flex:1;
-    border:1.5px solid var(--line);
-    border-radius:5px;
-    padding:14px;
-  }
-  .mstatus-card.ok{border-color:var(--ok); background:var(--ok-bg);}
-  .mstatus-card.no{border-color:#e0ddd2; background:#f7f6f1;}
-  .mstatus-card .lab{
-    font-family:var(--mono); font-size:10px; text-transform:uppercase;
-    letter-spacing:.06em; color:var(--ink-soft); margin-bottom:4px;
-  }
-  .mstatus-card .big{font-family:var(--serif); font-size:17px; font-weight:600;}
-  .mstatus-card.ok .big{color:var(--ok);}
-  .mstatus-card .detail{font-size:11.5px; color:var(--ink-soft); margin-top:4px;}
-
   .modal-actions{
     display:flex; gap:10px;
     border-top:1px solid var(--line);
@@ -590,7 +539,6 @@
     .modal-close{width:44px; height:44px;}
     .modal-body{padding:20px 18px 24px;}
     .mgrid{grid-template-columns:1fr;}
-    .mstatus-row{flex-direction:column;}
     .modal-actions{flex-direction:column;}
     .btn-primary{min-height:44px; display:flex; align-items:center; justify-content:center;}
 
@@ -695,21 +643,8 @@
       <h2 id="modalNombre">—</h2>
     </div>
     <div class="modal-body">
-      <div class="mgallery" id="mGallery" style="display:none;">
-        <img class="mgallery-main" id="mGalleryMain" src="" alt="Foto del predio">
-        <div class="mgallery-thumbs" id="mGalleryThumbs"></div>
-      </div>
-
       <div class="modal-actions" id="mSharepointActions" style="display:none;">
         <a class="btn-primary" id="mSharepointLink" href="#" target="_blank" rel="noopener">Ver fotos en SharePoint</a>
-      </div>
-
-      <div class="mstatus-row">
-        <div class="mstatus-card" id="cardFoto">
-          <div class="lab">Registro fotográfico</div>
-          <div class="big" id="mFotoEstado">—</div>
-          <div class="detail" id="mFotoDetalle"></div>
-        </div>
       </div>
 
       <div class="mgrid">
@@ -1007,34 +942,6 @@ function goPage(p){
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
-function renderGallery(fotos){
-  const gallery = document.getElementById('mGallery');
-  const main = document.getElementById('mGalleryMain');
-  const thumbs = document.getElementById('mGalleryThumbs');
-
-  if(!Array.isArray(fotos) || fotos.length === 0){
-    gallery.style.display = 'none';
-    main.src = '';
-    thumbs.innerHTML = '';
-    return;
-  }
-
-  gallery.style.display = 'block';
-  main.src = fotos[0];
-  thumbs.innerHTML = fotos.map((url, i) =>
-    `<img class="mgallery-thumb${i===0?' active':''}" src="${url}" data-idx="${i}" onclick="selectGalleryPhoto(${i})">`
-  ).join('');
-  thumbs.dataset.fotos = JSON.stringify(fotos);
-}
-
-function selectGalleryPhoto(idx){
-  const thumbs = document.getElementById('mGalleryThumbs');
-  const fotos = JSON.parse(thumbs.dataset.fotos || '[]');
-  if(!fotos[idx]) return;
-  document.getElementById('mGalleryMain').src = fotos[idx];
-  thumbs.querySelectorAll('.mgallery-thumb').forEach((t,i)=> t.classList.toggle('active', i===idx));
-}
-
 function buildSharepointUrl(nombreCarpeta){
   const base = 'https://activosporcolombia.sharepoint.com/sites/ActiBOX-FVR/FOTOS%20%20FRV/Forms/AllItems.aspx';
   const idPath = `/sites/ActiBOX-FVR/FOTOS  FRV/${nombreCarpeta}`;
@@ -1046,8 +953,6 @@ function openModal(idx){
   document.getElementById('modalCodigo').textContent = d['CÓDIGO FRV'] || ('Código '+d['CÓDIGO']);
   document.getElementById('modalNombre').textContent = d['NOMBRE BIEN'] || 'Sin nombre registrado';
 
-  renderGallery(d['FOTOS_CLOUDINARY']);
-
   const nombreCarpeta = (d['FMI'] || d['CÓDIGO FRV'] || '').trim();
   const sharepointActions = document.getElementById('mSharepointActions');
   if(nombreCarpeta){
@@ -1056,16 +961,6 @@ function openModal(idx){
   }else{
     sharepointActions.style.display = 'none';
   }
-
-  const cantFotosCloudinary = Array.isArray(d['FOTOS_CLOUDINARY']) ? d['FOTOS_CLOUDINARY'].length : 0;
-  const foto = cantFotosCloudinary > 0;
-
-  const cardFoto = document.getElementById('cardFoto');
-  cardFoto.className = 'mstatus-card ' + (foto ? 'ok':'no');
-  document.getElementById('mFotoEstado').textContent = foto ? 'Disponible' : 'No registrado';
-  document.getElementById('mFotoDetalle').textContent = foto
-    ? `${cantFotosCloudinary} fotos`
-    : 'Sin álbum fotográfico cargado';
 
   document.getElementById('mFmi').textContent = d['FMI'] || 'No aplica';
   document.getElementById('mDepto').textContent = d['DEPARTAMENTO'] || '—';
