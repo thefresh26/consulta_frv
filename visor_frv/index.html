@@ -700,6 +700,10 @@
         <div class="mgallery-thumbs" id="mGalleryThumbs"></div>
       </div>
 
+      <div class="modal-actions" id="mSharepointActions" style="display:none;">
+        <a class="btn-primary" id="mSharepointLink" href="#" target="_blank" rel="noopener">Ver fotos en SharePoint</a>
+      </div>
+
       <div class="mstatus-row">
         <div class="mstatus-card" id="cardFoto">
           <div class="lab">Registro fotográfico</div>
@@ -1031,12 +1035,27 @@ function selectGalleryPhoto(idx){
   thumbs.querySelectorAll('.mgallery-thumb').forEach((t,i)=> t.classList.toggle('active', i===idx));
 }
 
+function buildSharepointUrl(nombreCarpeta){
+  const base = 'https://activosporcolombia.sharepoint.com/sites/ActiBOX-FVR/FOTOS%20%20FRV/Forms/AllItems.aspx';
+  const idPath = `/sites/ActiBOX-FVR/FOTOS  FRV/${nombreCarpeta}`;
+  return `${base}?id=${encodeURI(idPath)}&p=true&ga=1`;
+}
+
 function openModal(idx){
   const d = DATA[idx];
   document.getElementById('modalCodigo').textContent = d['CÓDIGO FRV'] || ('Código '+d['CÓDIGO']);
   document.getElementById('modalNombre').textContent = d['NOMBRE BIEN'] || 'Sin nombre registrado';
 
   renderGallery(d['FOTOS_CLOUDINARY']);
+
+  const nombreCarpeta = (d['FMI'] || d['CÓDIGO FRV'] || '').trim();
+  const sharepointActions = document.getElementById('mSharepointActions');
+  if(nombreCarpeta){
+    sharepointActions.style.display = '';
+    document.getElementById('mSharepointLink').href = buildSharepointUrl(nombreCarpeta);
+  }else{
+    sharepointActions.style.display = 'none';
+  }
 
   const cantFotosCloudinary = Array.isArray(d['FOTOS_CLOUDINARY']) ? d['FOTOS_CLOUDINARY'].length : 0;
   const foto = cantFotosCloudinary > 0;
