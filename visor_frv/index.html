@@ -1078,5 +1078,21 @@ window.addEventListener('resize', ()=>{
 
 loadData();
 </script>
+<script>
+/* Cierre de sesión automático por inactividad (10 min), igual que en
+   los visores de SAE. Cualquier click/tecla/scroll reinicia el reloj. */
+(function(){
+  var MINUTOS_INACTIVIDAD = 10;
+  var t = null;
+  function reiniciar(){
+    if(t) clearTimeout(t);
+    t = setTimeout(function(){ window.location.href = '/logout?motivo=inactividad'; }, MINUTOS_INACTIVIDAD * 60 * 1000);
+  }
+  ['click','keydown','mousemove','scroll','touchstart'].forEach(function(ev){
+    document.addEventListener(ev, reiniciar, {passive:true});
+  });
+  reiniciar();
+})();
+</script>
 </body>
 </html>
