@@ -770,7 +770,7 @@ function tieneAvaluoComercialValido(d){
 }
 
 function tieneFotoValida(d){
-  return Array.isArray(d['FOTOS_CLOUDINARY']) && d['FOTOS_CLOUDINARY'].length > 0;
+  return (parseInt(d['CANT_FOTOS_LOCAL'], 10) || 0) > 0;
 }
 
 function extintoLabel(v){
@@ -873,7 +873,7 @@ function render(){
         <div class="card-badges-row">
           <span class="etapa-pill ${etapaClass(d['ETAPA GESTIÓN'])}">${d['ETAPA GESTIÓN']||'—'}</span>
           ${foto
-            ? `<span class="badge si"><span class="dot"></span>Foto&nbsp;·&nbsp;${d['CANT. FOTOS']||0}</span>`
+            ? `<span class="badge si"><span class="dot"></span>Foto&nbsp;·&nbsp;${d['CANT_FOTOS_LOCAL']||0}</span>`
             : `<span class="badge no"><span class="dot"></span>Sin foto</span>`}
           ${aval
             ? `<span class="badge si"><span class="dot"></span>Avalúo&nbsp;${d['AÑO AVALÚO']||''}</span>`
@@ -888,8 +888,8 @@ function render(){
     cardsContainer.innerHTML = '';
     tbody.innerHTML = pageItems.map(d=>{
       const idx = DATA.indexOf(d);
-      const cantFotosCloudinary = Array.isArray(d['FOTOS_CLOUDINARY']) ? d['FOTOS_CLOUDINARY'].length : 0;
-      const foto = cantFotosCloudinary > 0;
+      const cantFotosLocal = parseInt(d['CANT_FOTOS_LOCAL'], 10) || 0;
+      const foto = cantFotosLocal > 0;
       const aval = tieneAvaluoValido(d);
       let anioAvaluoLabel = 'Sí';
       if(d['AÑO AVALÚO']){
@@ -905,7 +905,7 @@ function render(){
         <td><span class="etapa-pill ${etapaClass(d['ETAPA GESTIÓN'])}">${d['ETAPA GESTIÓN']||'—'}</span></td>
         <td>${extintoLabel(d['EXTINCIÓN DOMINIO'])}</td>
         <td>${d['ÁREA HA CATASTRO']||'—'}</td>
-        <td>${foto ? `<span class="badge si"><span class="dot"></span>Sí · ${cantFotosCloudinary}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>
+        <td>${foto ? `<span class="badge si"><span class="dot"></span>Sí · ${cantFotosLocal}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>
         ${hayColumnaAvaluo ? `<td>${aval ? `<span class="badge si"><span class="dot"></span>${anioAvaluoLabel}</span>` : `<span class="badge no"><span class="dot"></span>No</span>`}</td>` : ''}
       </tr>`;
     }).join('');
