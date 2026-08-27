@@ -21,6 +21,9 @@
     --mono: 'IBM Plex Mono', 'Courier New', monospace;
     --serif: 'Source Serif 4', Georgia, serif;
     --sans: 'IBM Plex Sans', Arial, sans-serif;
+    --ease: cubic-bezier(.4,0,.2,1);
+    --dur-fast: .18s;
+    --dur-med: .25s;
   }
 
   *{box-sizing:border-box;}
@@ -144,7 +147,7 @@
     font-size:14px;
     background:var(--paper-2);
     color:var(--ink);
-    transition:border-color .15s;
+    transition:border-color var(--dur-fast) var(--ease);
   }
   .search-box input:focus{
     outline:none;
@@ -168,6 +171,7 @@
     background:var(--paper-2);
     color:var(--ink);
     cursor:pointer;
+    transition:border-color var(--dur-fast) var(--ease);
   }
   select:focus{outline:none; border-color:var(--gold-deep);}
 
@@ -185,6 +189,7 @@
     font-size:13px;
     background:var(--paper-2);
     color:var(--ink);
+    transition:border-color var(--dur-fast) var(--ease);
   }
   .area-filter input:focus{outline:none; border-color:var(--gold-deep);}
   .area-sep{color:var(--ink-soft); font-size:13px;}
@@ -203,10 +208,11 @@
     font-weight:600;
     color:var(--ink-soft);
     cursor:pointer;
-    transition:.12s;
+    transition:background var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease);
     white-space:nowrap;
   }
   .toggle-btn:hover{border-color:var(--gold);}
+  .toggle-btn:active{transform:scale(.96);}
   .toggle-btn.active{
     background:var(--ink);
     border-color:var(--ink);
@@ -222,8 +228,10 @@
     color:var(--ink-soft);
     text-decoration:underline;
     cursor:pointer;
+    transition:color var(--dur-fast) var(--ease);
   }
   .clear-btn:hover{color:var(--no);}
+  .clear-btn:active{transform:scale(.97);}
 
   /* ── BODY LAYOUT ────────────────────────────────────────── */
   .layout{
@@ -271,11 +279,13 @@
   tbody tr{
     border-bottom:1px solid var(--line);
     cursor:pointer;
-    transition:background .1s;
+    transition:background var(--dur-fast) var(--ease);
+    animation:rowFadeIn var(--dur-med) var(--ease) both;
   }
   tbody tr:hover{background:var(--gold-pale);}
   tbody tr:nth-child(even){background:#fbfaf7;}
   tbody tr:nth-child(even):hover{background:var(--gold-pale);}
+  @keyframes rowFadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 
   td{
     padding:10px 12px;
@@ -341,8 +351,10 @@
     cursor:pointer;
     font-size:12.5px;
     color:var(--ink-soft);
+    transition:border-color var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease);
   }
   .page-btn:hover:not(:disabled){border-color:var(--gold-deep); color:var(--ink);}
+  .page-btn:active:not(:disabled){transform:scale(.94);}
   .page-btn:disabled{opacity:.35; cursor:default;}
   .page-btn.current{background:var(--ink); color:#fff; border-color:var(--ink);}
 
@@ -351,7 +363,9 @@
     text-align:center;
     padding:70px 20px;
     color:var(--ink-soft);
+    animation:emptyFadeIn var(--dur-med) var(--ease) both;
   }
+  @keyframes emptyFadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
   .empty-state svg{width:42px; height:42px; stroke:var(--line); margin-bottom:14px;}
   .empty-state h3{font-family:var(--serif); font-size:18px; color:var(--ink); margin:0 0 6px;}
 
@@ -359,14 +373,23 @@
   .modal-overlay{
     position:fixed; inset:0;
     background:rgba(20,18,12,.55);
-    display:none;
+    display:flex;
     align-items:flex-start;
     justify-content:center;
     z-index:200;
     padding:40px 20px;
     overflow-y:auto;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity var(--dur-med) var(--ease),visibility 0s linear var(--dur-med);
   }
-  .modal-overlay.open{display:flex;}
+  .modal-overlay.open{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+    transition:opacity var(--dur-med) var(--ease),visibility 0s linear 0s;
+  }
   .modal{
     background:var(--paper-2);
     max-width:680px;
@@ -374,7 +397,10 @@
     border-radius:6px;
     box-shadow:0 24px 60px rgba(0,0,0,.3);
     overflow:hidden;
+    transform:translateY(14px) scale(.98);
+    transition:transform var(--dur-med) var(--ease);
   }
+  .modal-overlay.open .modal{transform:translateY(0) scale(1);}
   .modal-head{
     background:var(--ink);
     color:#fff;
@@ -404,9 +430,10 @@
     width:30px; height:30px;
     display:flex; align-items:center; justify-content:center;
     border-radius:50%;
-    transition:.12s;
+    transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease);
   }
   .modal-close:hover{background:rgba(255,255,255,.12); color:#fff;}
+  .modal-close:active{transform:scale(.9);}
 
   .modal-body{padding:24px 26px 28px;}
 
@@ -460,9 +487,10 @@
     font-weight:600;
     border:none;
     cursor:pointer;
-    transition:background .15s;
+    transition:background var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease);
   }
   .btn-primary:hover{background:#4f7a34;}
+  .btn-primary:active{transform:scale(.97);}
 
   /* ── FOOTER ─────────────────────────────────────────────── */
   footer{
@@ -482,10 +510,11 @@
     border-radius:6px;
     padding:14px 16px;
     cursor:pointer;
-    transition:background .12s, border-color .12s;
+    transition:background var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease);
     position:relative;
+    animation:rowFadeIn var(--dur-med) var(--ease) both;
   }
-  .predio-card:active{background:var(--gold-pale); border-color:var(--gold);}
+  .predio-card:active{background:var(--gold-pale); border-color:var(--gold); transform:scale(.98);}
   .card-top{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;}
   .card-top-left{flex:1; min-width:0;}
   .card-codigo{font-family:var(--mono); font-size:11px; color:var(--ink-soft); margin-bottom:3px;}
@@ -549,6 +578,18 @@
   ::-webkit-scrollbar{width:10px; height:10px;}
   ::-webkit-scrollbar-track{background:var(--paper);}
   ::-webkit-scrollbar-thumb{background:var(--line); border-radius:5px;}
+
+  /* REDUCED MOTION: respeta la preferencia del usuario */
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{
+      animation-duration:.01ms !important;
+      animation-delay:0s !important;
+      animation-iteration-count:1 !important;
+      transition-duration:.01ms !important;
+      transition-delay:0s !important;
+      scroll-behavior:auto !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -850,14 +891,15 @@ function render(){
     tableWrap.style.display = 'none';
     cardsContainer.style.display = 'flex';
     tbody.innerHTML = '';
-    cardsContainer.innerHTML = pageItems.map(d=>{
+    cardsContainer.innerHTML = pageItems.map((d,i)=>{
       const idx = DATA.indexOf(d);
+      const delay = Math.min(i*25, 300);
       const foto = tieneFotoValida(d);
       const aval = tieneAvaluoValido(d);
       const tipo = (d['TIPO BIEN']||'').split(' - ').slice(1).join(' · ');
       const ubicacion = [d['MUNICIPIO'], d['DEPARTAMENTO']].filter(Boolean).join(', ');
       return `
-      <div class="predio-card" onclick="openModal(${idx})">
+      <div class="predio-card" style="animation-delay:${delay}ms" onclick="openModal(${idx})">
         <div class="card-top">
           <div class="card-top-left">
             <div class="card-codigo">${d['CÓDIGO FRV']||'—'}</div>
@@ -886,8 +928,9 @@ function render(){
     tableWrap.style.display = '';
     cardsContainer.style.display = 'none';
     cardsContainer.innerHTML = '';
-    tbody.innerHTML = pageItems.map(d=>{
+    tbody.innerHTML = pageItems.map((d,i)=>{
       const idx = DATA.indexOf(d);
+      const delay = Math.min(i*25, 300);
       const cantFotosCloudinary = Array.isArray(d['FOTOS_CLOUDINARY']) ? d['FOTOS_CLOUDINARY'].length : 0;
       const foto = cantFotosCloudinary > 0;
       const aval = tieneAvaluoValido(d);
@@ -897,7 +940,7 @@ function render(){
         anioAvaluoLabel = (Number.isInteger(anio) && anio >= 2000) ? anio : '—';
       }
       return `
-      <tr onclick="openModal(${idx})">
+      <tr style="animation-delay:${delay}ms" onclick="openModal(${idx})">
         <td class="td-codigo">${d['CÓDIGO FRV']||'—'}</td>
         <td class="td-nombre">${d['NOMBRE BIEN']||'Sin nombre'}<span class="sub">${(d['TIPO BIEN']||'').split(' - ').slice(1).join(' · ')}</span></td>
         <td class="td-fmi">${d['FMI']||'—'}</td>
